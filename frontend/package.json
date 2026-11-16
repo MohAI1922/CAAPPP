@@ -1,0 +1,36 @@
+{
+  "name": "verimath-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "proxy": "http://127.0.0.1:8000",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "katex": "^0.16.10",
+    "lucide-react": "^0.395.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.4.4",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

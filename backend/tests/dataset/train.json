@@ -1,0 +1,2525 @@
+[
+  {
+    "id": "arith_001",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "What is 47 × 89 + 123?",
+    "correct_answer": "4306",
+    "lean_statement": "example : 47 * 89 + 123 = 4306 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "47 * 89 + 123",
+      "answer": "4306"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_002",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Calculate 15 × 16 - 45",
+    "correct_answer": "195",
+    "lean_statement": "example : 15 * 16 - 45 = 195 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "15 * 16 - 45",
+      "answer": "195"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_003",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 120 ÷ 4 + 85",
+    "correct_answer": "115",
+    "lean_statement": "example : 120 / 4 + 85 = 115 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "120 / 4 + 85",
+      "answer": "115"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_004",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Find the value of 2^10 + 24",
+    "correct_answer": "1048",
+    "lean_statement": "example : 2^10 + 24 = 1048 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "2^10 + 24",
+      "answer": "1048"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_005",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Compute 35 × 12 + 180",
+    "correct_answer": "600",
+    "lean_statement": "example : 35 * 12 + 180 = 600 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "35 * 12 + 180",
+      "answer": "600"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_006",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Calculate 144 ÷ 12 + 88",
+    "correct_answer": "100",
+    "lean_statement": "example : 144 / 12 + 88 = 100 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "144 / 12 + 88",
+      "answer": "100"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_007",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 25 × 25 - 25",
+    "correct_answer": "600",
+    "lean_statement": "example : 25 * 25 - 25 = 600 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "25 * 25 - 25",
+      "answer": "600"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_008",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Find the value of 1000 - 45 × 18",
+    "correct_answer": "190",
+    "lean_statement": "example : 1000 - 45 * 18 = 190 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "1000 - 45 * 18",
+      "answer": "190"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_009",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "What is 3^5 + 7?",
+    "correct_answer": "250",
+    "lean_statement": "example : 3^5 + 7 = 250 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "3^5 + 7",
+      "answer": "250"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_010",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Compute 64 × 8 + 12",
+    "correct_answer": "524",
+    "lean_statement": "example : 64 * 8 + 12 = 524 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "64 * 8 + 12",
+      "answer": "524"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_011",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 500 ÷ 25 + 300",
+    "correct_answer": "320",
+    "lean_statement": "example : 500 / 25 + 300 = 320 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "500 / 25 + 300",
+      "answer": "320"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_012",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Calculate 17 × 19",
+    "correct_answer": "323",
+    "lean_statement": "example : 17 * 19 = 323 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "17 * 19",
+      "answer": "323"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_013",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "What is 13² + 14²?",
+    "correct_answer": "365",
+    "lean_statement": "example : 13 * 13 + 14 * 14 = 365 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "13 * 13 + 14 * 14",
+      "answer": "365"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_014",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 5^4 - 25",
+    "correct_answer": "600",
+    "lean_statement": "example : 5^4 - 25 = 600 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "5^4 - 25",
+      "answer": "600"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_015",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Compute 1024 ÷ 16 + 36",
+    "correct_answer": "100",
+    "lean_statement": "example : 1024 / 16 + 36 = 100 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "1024 / 16 + 36",
+      "answer": "100"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_016",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Calculate 99 × 11 + 1",
+    "correct_answer": "1090",
+    "lean_statement": "example : 99 * 11 + 1 = 1090 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "99 * 11 + 1",
+      "answer": "1090"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_017",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 75 × 4 - 50",
+    "correct_answer": "250",
+    "lean_statement": "example : 75 * 4 - 50 = 250 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "75 * 4 - 50",
+      "answer": "250"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_018",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Compute 81 ÷ 9 + 91",
+    "correct_answer": "100",
+    "lean_statement": "example : 81 / 9 + 91 = 100 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "81 / 9 + 91",
+      "answer": "100"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_019",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "What is 12 × 15 + 20?",
+    "correct_answer": "200",
+    "lean_statement": "example : 12 * 15 + 20 = 200 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "12 * 15 + 20",
+      "answer": "200"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_020",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Evaluate 400 - 15 × 20",
+    "correct_answer": "100",
+    "lean_statement": "example : 400 - 15 * 20 = 100 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "400 - 15 * 20",
+      "answer": "100"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_021",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "Compute 2^8 + 2^7",
+    "correct_answer": "384",
+    "lean_statement": "example : 2^8 + 2^7 = 384 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "2^8 + 2^7",
+      "answer": "384"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "arith_022",
+    "source": "Egyptian Grade 10 Math",
+    "category": "arithmetic",
+    "template_id": "arithmetic",
+    "problem_text": "What is 18² + 76?",
+    "correct_answer": "400",
+    "lean_statement": "example : 18 * 18 + 76 = 400 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "18 * 18 + 76",
+      "answer": "400"
+    },
+    "difficulty": "easy",
+    "notes": "Basic integer arithmetic"
+  },
+  {
+    "id": "alg_001",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 1)² − x²",
+    "correct_answer": "2*x + 1",
+    "lean_statement": "example (x : ℝ) : (x + 1)^2 - x^2 = 2*x + 1 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 1)^2 - x^2",
+      "answer": "2*x + 1"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_002",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 2)² − 4x",
+    "correct_answer": "x^2 + 4",
+    "lean_statement": "example (x : ℝ) : (x + 2)^2 - 4*x = x^2 + 4 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 2)^2 - 4*x",
+      "answer": "x^2 + 4"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_003",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Expand (x - 1)(x + 1)",
+    "correct_answer": "x^2 - 1",
+    "lean_statement": "example (x : ℝ) : (x - 1)*(x + 1) = x^2 - 1 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - 1)*(x + 1)",
+      "answer": "x^2 - 1"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_004",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 3)² − 6x",
+    "correct_answer": "x^2 + 9",
+    "lean_statement": "example (x : ℝ) : (x + 3)^2 - 6*x = x^2 + 9 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 3)^2 - 6*x",
+      "answer": "x^2 + 9"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_005",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x - 2)² + 4x",
+    "correct_answer": "x^2 + 4",
+    "lean_statement": "example (x : ℝ) : (x - 2)^2 + 4*x = x^2 + 4 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - 2)^2 + 4*x",
+      "answer": "x^2 + 4"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_006",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify 2(x + 3) + 3(x - 2)",
+    "correct_answer": "5*x",
+    "lean_statement": "example (x : ℝ) : 2*(x + 3) + 3*(x - 2) = 5*x := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "2*(x + 3) + 3*(x - 2)",
+      "answer": "5*x"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_007",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Expand (x + 4)(x - 4)",
+    "correct_answer": "x^2 - 16",
+    "lean_statement": "example (x : ℝ) : (x + 4)*(x - 4) = x^2 - 16 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 4)*(x - 4)",
+      "answer": "x^2 - 16"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_008",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (2x + 1)² − 4x²",
+    "correct_answer": "4*x + 1",
+    "lean_statement": "example (x : ℝ) : (2*x + 1)^2 - 4*x^2 = 4*x + 1 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(2*x + 1)^2 - 4*x^2",
+      "answer": "4*x + 1"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_009",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 5)² − x² − 10x",
+    "correct_answer": "25",
+    "lean_statement": "example (x : ℝ) : (x + 5)^2 - x^2 - 10*x = 25 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 5)^2 - x^2 - 10*x",
+      "answer": "25"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_010",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify x(x + 2) − 2x",
+    "correct_answer": "x^2",
+    "lean_statement": "example (x : ℝ) : x*(x + 2) - 2*x = x^2 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x*(x + 2) - 2*x",
+      "answer": "x^2"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_011",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x - 3)(x + 3) + 9",
+    "correct_answer": "x^2",
+    "lean_statement": "example (x : ℝ) : (x - 3)*(x + 3) + 9 = x^2 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - 3)*(x + 3) + 9",
+      "answer": "x^2"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_012",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (3x + 2) − (2x − 3)",
+    "correct_answer": "x + 5",
+    "lean_statement": "example (x : ℝ) : (3*x + 2) - (2*x - 3) = x + 5 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(3*x + 2) - (2*x - 3)",
+      "answer": "x + 5"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_013",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Expand (x + 2)(x + 3)",
+    "correct_answer": "x^2 + 5*x + 6",
+    "lean_statement": "example (x : ℝ) : (x + 2)*(x + 3) = x^2 + 5*x + 6 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 2)*(x + 3)",
+      "answer": "x^2 + 5*x + 6"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_014",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Expand (x - 4)(x + 2)",
+    "correct_answer": "x^2 - 2*x - 8",
+    "lean_statement": "example (x : ℝ) : (x - 4)*(x + 2) = x^2 - 2*x - 8 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - 4)*(x + 2)",
+      "answer": "x^2 - 2*x - 8"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_015",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (2x - 3)² − 4x²",
+    "correct_answer": "9 - 12*x",
+    "lean_statement": "example (x : ℝ) : (2*x - 3)^2 - 4*x^2 = 9 - 12*x := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(2*x - 3)^2 - 4*x^2",
+      "answer": "9 - 12*x"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_016",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify 3(x² + 2) − 3x²",
+    "correct_answer": "6",
+    "lean_statement": "example (x : ℝ) : 3*(x^2 + 2) - 3*x^2 = 6 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "3*(x^2 + 2) - 3*x^2",
+      "answer": "6"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_017",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 1)³ − x³ − 3x²",
+    "correct_answer": "3*x + 1",
+    "lean_statement": "example (x : ℝ) : (x + 1)^3 - x^3 - 3*x^2 = 3*x + 1 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 1)^3 - x^3 - 3*x^2",
+      "answer": "3*x + 1"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_018",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x - 1)² + 2x",
+    "correct_answer": "x^2 + 1",
+    "lean_statement": "example (x : ℝ) : (x - 1)^2 + 2*x = x^2 + 1 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - 1)^2 + 2*x",
+      "answer": "x^2 + 1"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_019",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + 6)(x - 6) + 36",
+    "correct_answer": "x^2",
+    "lean_statement": "example (x : ℝ) : (x + 6)*(x - 6) + 36 = x^2 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + 6)*(x - 6) + 36",
+      "answer": "x^2"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_020",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify 4(x + 1) − 2(2x − 1)",
+    "correct_answer": "6",
+    "lean_statement": "example (x : ℝ) : 4*(x + 1) - 2*(2*x - 1) = 6 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "4*(x + 1) - 2*(2*x - 1)",
+      "answer": "6"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_021",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x + y)² − 2xy",
+    "correct_answer": "x^2 + y^2",
+    "lean_statement": "example (x : ℝ) : (x + y)^2 - 2*x*y = x^2 + y^2 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x + y)^2 - 2*x*y",
+      "answer": "x^2 + y^2"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "alg_022",
+    "source": "Egyptian Grade 10 Algebra",
+    "category": "algebraic_simplification",
+    "template_id": "algebraic_simplification",
+    "problem_text": "Simplify (x - y)² + 2xy",
+    "correct_answer": "x^2 + y^2",
+    "lean_statement": "example (x : ℝ) : (x - y)^2 + 2*x*y = x^2 + y^2 := by ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "(x - y)^2 + 2*x*y",
+      "answer": "x^2 + y^2"
+    },
+    "difficulty": "medium",
+    "notes": "Polynomial ring identity"
+  },
+  {
+    "id": "eqn_001",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 7 = 22",
+    "correct_answer": "5",
+    "lean_statement": "example : (3 * x + 7 = 22) ↔ (x = 5) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "7",
+      "c": "22",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_002",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 4 = 25",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + 4 = 25) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "4",
+      "c": "25",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_003",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 1 = 16",
+    "correct_answer": "5",
+    "lean_statement": "example : (3 * x + 1 = 16) ↔ (x = 5) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "1",
+      "c": "16",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_004",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 10 = 40",
+    "correct_answer": "10",
+    "lean_statement": "example : (3 * x + 10 = 40) ↔ (x = 10) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "10",
+      "c": "40",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_005",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 5 = 16",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -5 = 16) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-5",
+      "c": "16",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_006",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 2 = 20",
+    "correct_answer": "6",
+    "lean_statement": "example : (3 * x + 2 = 20) ↔ (x = 6) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "2",
+      "c": "20",
+      "answer": "6"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_007",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 9 = 30",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + 9 = 30) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "9",
+      "c": "30",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_008",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 2 = 19",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -2 = 19) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-2",
+      "c": "19",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_009",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 5 = 35",
+    "correct_answer": "10",
+    "lean_statement": "example : (3 * x + 5 = 35) ↔ (x = 10) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "5",
+      "c": "35",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_010",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 8 = 26",
+    "correct_answer": "6",
+    "lean_statement": "example : (3 * x + 8 = 26) ↔ (x = 6) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "8",
+      "c": "26",
+      "answer": "6"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_011",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 12 = 42",
+    "correct_answer": "10",
+    "lean_statement": "example : (3 * x + 12 = 42) ↔ (x = 10) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "12",
+      "c": "42",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_012",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 8 = 13",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -8 = 13) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-8",
+      "c": "13",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_013",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 3 = 24",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + 3 = 24) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "3",
+      "c": "24",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_014",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 6 = 27",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + 6 = 27) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "6",
+      "c": "27",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_015",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 1 = 20",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -1 = 20) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-1",
+      "c": "20",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_016",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 15 = 45",
+    "correct_answer": "10",
+    "lean_statement": "example : (3 * x + 15 = 45) ↔ (x = 10) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "15",
+      "c": "45",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_017",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 4 = 17",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -4 = 17) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-4",
+      "c": "17",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_018",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 11 = 38",
+    "correct_answer": "9",
+    "lean_statement": "example : (3 * x + 11 = 38) ↔ (x = 9) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "11",
+      "c": "38",
+      "answer": "9"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_019",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x - 7 = 14",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + -7 = 14) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "-7",
+      "c": "14",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_020",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 14 = 44",
+    "correct_answer": "10",
+    "lean_statement": "example : (3 * x + 14 = 44) ↔ (x = 10) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "14",
+      "c": "44",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_021",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 0 = 21",
+    "correct_answer": "7",
+    "lean_statement": "example : (3 * x + 0 = 21) ↔ (x = 7) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "0",
+      "c": "21",
+      "answer": "7"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "eqn_022",
+    "source": "Egyptian Grade 10 Linear Equations",
+    "category": "equation_solving",
+    "template_id": "equation_solving",
+    "problem_text": "Solve 3x + 13 = 40",
+    "correct_answer": "9",
+    "lean_statement": "example : (3 * x + 13 = 40) ↔ (x = 9) := by omega",
+    "lean_verified": true,
+    "slot_values": {
+      "a": "x",
+      "b": "13",
+      "c": "40",
+      "answer": "9"
+    },
+    "difficulty": "medium",
+    "notes": "Linear integer equation"
+  },
+  {
+    "id": "calc_deriv_001",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x² sin(x) with respect to x",
+    "correct_answer": "2*x * sin(x) + x^2 * cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^2 * Real.sin x) x = 2*x * Real.sin x + x^2 * Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^2 * Real.sin x",
+      "answer": "2*x * Real.sin x + x^2 * Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_002",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x cos(x) with respect to x",
+    "correct_answer": "cos(x) - x * sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x * Real.cos x) x = Real.cos x - x * Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x * Real.cos x",
+      "answer": "Real.cos x - x * Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_003",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate x³ with respect to x",
+    "correct_answer": "3 * x^2",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^3) x = 3 * x^2 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^3",
+      "answer": "3 * x^2"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_004",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find d/dx of x⁴",
+    "correct_answer": "4 * x^3",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^4) x = 4 * x^3 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^4",
+      "answer": "4 * x^3"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_005",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of sin(x)",
+    "correct_answer": "cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => Real.sin x) x = Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "Real.sin x",
+      "answer": "Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_006",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of cos(x)",
+    "correct_answer": "-sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => Real.cos x) x = -Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "Real.cos x",
+      "answer": "-Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_007",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of exp(x)",
+    "correct_answer": "exp(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => Real.exp x) x = Real.exp x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "Real.exp x",
+      "answer": "Real.exp x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_008",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x exp(x)",
+    "correct_answer": "exp(x) + x * exp(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x * Real.exp x) x = Real.exp x + x * Real.exp x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x * Real.exp x",
+      "answer": "Real.exp x + x * Real.exp x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_009",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate x² + 3x with respect to x",
+    "correct_answer": "2*x + 3",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^2 + 3*x) x = 2*x + 3 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^2 + 3*x",
+      "answer": "2*x + 3"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_010",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x⁵",
+    "correct_answer": "5 * x^4",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^5) x = 5 * x^4 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^5",
+      "answer": "5 * x^4"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_011",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x² cos(x)",
+    "correct_answer": "2*x * cos(x) - x^2 * sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^2 * Real.cos x) x = 2*x * Real.cos x - x^2 * Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^2 * Real.cos x",
+      "answer": "2*x * Real.cos x - x^2 * Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_012",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x sin(x)",
+    "correct_answer": "sin(x) + x * cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x * Real.sin x) x = Real.sin x + x * Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x * Real.sin x",
+      "answer": "Real.sin x + x * Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_013",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 3x²",
+    "correct_answer": "6 * x",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 3 * x^2) x = 6 * x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "3 * x^2",
+      "answer": "6 * x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_014",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 4x³",
+    "correct_answer": "12 * x^2",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 4 * x^3) x = 12 * x^2 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "4 * x^3",
+      "answer": "12 * x^2"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_015",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x² exp(x)",
+    "correct_answer": "2*x * exp(x) + x^2 * exp(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^2 * Real.exp x) x = 2*x * Real.exp x + x^2 * Real.exp x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^2 * Real.exp x",
+      "answer": "2*x * Real.exp x + x^2 * Real.exp x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_016",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of sin(x) cos(x)",
+    "correct_answer": "cos(x) * cos(x) - sin(x) * sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => Real.sin x * Real.cos x) x = Real.cos x * Real.cos x - Real.sin x * Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "Real.sin x * Real.cos x",
+      "answer": "Real.cos x * Real.cos x - Real.sin x * Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_017",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 5x",
+    "correct_answer": "5",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 5 * x) x = 5 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "5 * x",
+      "answer": "5"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_018",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x⁶",
+    "correct_answer": "6 * x^5",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^6) x = 6 * x^5 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^6",
+      "answer": "6 * x^5"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_019",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate 2 sin(x)",
+    "correct_answer": "2 * cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 2 * Real.sin x) x = 2 * Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "2 * Real.sin x",
+      "answer": "2 * Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_020",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate 3 cos(x)",
+    "correct_answer": "-3 * sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 3 * Real.cos x) x = -3 * Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "3 * Real.cos x",
+      "answer": "-3 * Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_021",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x³ sin(x)",
+    "correct_answer": "3*x^2 * sin(x) + x^3 * cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^3 * Real.sin x) x = 3*x^2 * Real.sin x + x^3 * Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^3 * Real.sin x",
+      "answer": "3*x^2 * Real.sin x + x^3 * Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_022",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x³ cos(x)",
+    "correct_answer": "3*x^2 * cos(x) - x^3 * sin(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^3 * Real.cos x) x = 3*x^2 * Real.cos x - x^3 * Real.sin x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^3 * Real.cos x",
+      "answer": "3*x^2 * Real.cos x - x^3 * Real.sin x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_023",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate x⁴ + 2x",
+    "correct_answer": "4*x^3 + 2",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^4 + 2*x) x = 4*x^3 + 2 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^4 + 2*x",
+      "answer": "4*x^3 + 2"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_024",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 7x²",
+    "correct_answer": "14 * x",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 7 * x^2) x = 14 * x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "7 * x^2",
+      "answer": "14 * x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_025",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x² + x",
+    "correct_answer": "2*x + 1",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^2 + x) x = 2*x + 1 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^2 + x",
+      "answer": "2*x + 1"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_026",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 2 exp(x)",
+    "correct_answer": "2 * exp(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 2 * Real.exp x) x = 2 * Real.exp x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "2 * Real.exp x",
+      "answer": "2 * Real.exp x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_027",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Differentiate x³ + x²",
+    "correct_answer": "3*x^2 + 2*x",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^3 + x^2) x = 3*x^2 + 2*x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^3 + x^2",
+      "answer": "3*x^2 + 2*x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_028",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of 4 sin(x)",
+    "correct_answer": "4 * cos(x)",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => 4 * Real.sin x) x = 4 * Real.cos x := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "4 * Real.sin x",
+      "answer": "4 * Real.cos x"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_029",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x(x + 1)",
+    "correct_answer": "2*x + 1",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x * (x + 1)) x = 2*x + 1 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x * (x + 1)",
+      "answer": "2*x + 1"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_deriv_030",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "derivative",
+    "template_id": "derivative",
+    "problem_text": "Find the derivative of x⁷",
+    "correct_answer": "7 * x^6",
+    "lean_statement": "example (x : ℝ) : deriv (fun x => x^7) x = 7 * x^6 := by\n  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n  ring",
+    "lean_verified": true,
+    "slot_values": {
+      "expr": "x^7",
+      "answer": "7 * x^6"
+    },
+    "difficulty": "hard",
+    "notes": "Calculus single-variable derivative"
+  },
+  {
+    "id": "calc_int_001",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x² from 0 to 1",
+    "correct_answer": "1/3",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, x^2 = 1/3 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "x^2",
+      "answer": "1/3"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_002",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x from 0 to 1",
+    "correct_answer": "1/2",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, x = 1/2 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "x",
+      "answer": "1/2"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_003",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the integral of x³ from 0 to 1",
+    "correct_answer": "1/4",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, x^3 = 1/4 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "x^3",
+      "answer": "1/4"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_004",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x from 0 to 2",
+    "correct_answer": "2",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..2, x = 2 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "2",
+      "expr": "x",
+      "answer": "2"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_005",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x² from 0 to 2",
+    "correct_answer": "8/3",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..2, x^2 = 8/3 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "2",
+      "expr": "x^2",
+      "answer": "8/3"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_006",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₁² x dx",
+    "correct_answer": "3/2",
+    "lean_statement": "example : ∫ x in (1 : ℝ)..2, x = 3/2 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "1",
+      "upper": "2",
+      "expr": "x",
+      "answer": "3/2"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_007",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the integral of 1 from 0 to 1",
+    "correct_answer": "1",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, 1 = 1 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "1",
+      "answer": "1"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_008",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₀³ x dx",
+    "correct_answer": "9/2",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..3, x = 9/2 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "3",
+      "expr": "x",
+      "answer": "9/2"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_009",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x⁴ from 0 to 1",
+    "correct_answer": "1/5",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, x^4 = 1/5 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "x^4",
+      "answer": "1/5"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_010",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x from 1 to 3",
+    "correct_answer": "4",
+    "lean_statement": "example : ∫ x in (1 : ℝ)..3, x = 4 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "1",
+      "upper": "3",
+      "expr": "x",
+      "answer": "4"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_011",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the integral of 3x² from 0 to 2",
+    "correct_answer": "8",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..2, 3*x^2 = 8 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "2",
+      "expr": "3*x^2",
+      "answer": "8"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_012",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₀¹ 2x dx",
+    "correct_answer": "1",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, 2*x = 1 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "2*x",
+      "answer": "1"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_013",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of 2x from 0 to 2",
+    "correct_answer": "4",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..2, 2*x = 4 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "2",
+      "expr": "2*x",
+      "answer": "4"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_014",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the integral of x² from 1 to 2",
+    "correct_answer": "7/3",
+    "lean_statement": "example : ∫ x in (1 : ℝ)..2, x^2 = 7/3 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "1",
+      "upper": "2",
+      "expr": "x^2",
+      "answer": "7/3"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_015",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₀¹ 4x³ dx",
+    "correct_answer": "1",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, 4*x^3 = 1 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "4*x^3",
+      "answer": "1"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_016",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x² from 0 to 3",
+    "correct_answer": "9",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..3, x^2 = 9 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "3",
+      "expr": "x^2",
+      "answer": "9"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_017",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₀¹ (x + 1) dx",
+    "correct_answer": "3/2",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, x + 1 = 3/2 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "x + 1",
+      "answer": "3/2"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_018",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of x + 1 from 0 to 2",
+    "correct_answer": "4",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..2, x + 1 = 4 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "2",
+      "expr": "x + 1",
+      "answer": "4"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_019",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₁³ x² dx",
+    "correct_answer": "26/3",
+    "lean_statement": "example : ∫ x in (1 : ℝ)..3, x^2 = 26/3 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "1",
+      "upper": "3",
+      "expr": "x^2",
+      "answer": "26/3"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_020",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the definite integral of 3x² from 0 to 1",
+    "correct_answer": "1",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, 3*x^2 = 1 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "3*x^2",
+      "answer": "1"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_021",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₀⁴ x dx",
+    "correct_answer": "8",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..4, x = 8 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "4",
+      "expr": "x",
+      "answer": "8"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_022",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate the integral of 5x⁴ from 0 to 1",
+    "correct_answer": "1",
+    "lean_statement": "example : ∫ x in (0 : ℝ)..1, 5*x^4 = 1 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "0",
+      "upper": "1",
+      "expr": "5*x^4",
+      "answer": "1"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "calc_int_023",
+    "source": "Egyptian Grade 12 Calculus",
+    "category": "definite_integral",
+    "template_id": "definite_integral",
+    "problem_text": "Evaluate ∫₁² 3x² dx",
+    "correct_answer": "7",
+    "lean_statement": "example : ∫ x in (1 : ℝ)..2, 3*x^2 = 7 := by norm_num",
+    "lean_verified": true,
+    "slot_values": {
+      "lower": "1",
+      "upper": "2",
+      "expr": "3*x^2",
+      "answer": "7"
+    },
+    "difficulty": "hard",
+    "notes": "Polynomial definite interval integral"
+  },
+  {
+    "id": "num_001",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 2 prime?",
+    "correct_answer": "Nat.Prime 2",
+    "lean_statement": "example : Nat.Prime 2 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "2"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_002",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 3 prime?",
+    "correct_answer": "Nat.Prime 3",
+    "lean_statement": "example : Nat.Prime 3 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "3"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_003",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 5 prime?",
+    "correct_answer": "Nat.Prime 5",
+    "lean_statement": "example : Nat.Prime 5 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "5"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_004",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 7 prime?",
+    "correct_answer": "Nat.Prime 7",
+    "lean_statement": "example : Nat.Prime 7 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "7"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_005",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 11 prime?",
+    "correct_answer": "Nat.Prime 11",
+    "lean_statement": "example : Nat.Prime 11 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "11"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_006",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 13 prime?",
+    "correct_answer": "Nat.Prime 13",
+    "lean_statement": "example : Nat.Prime 13 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "13"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_007",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 17 prime?",
+    "correct_answer": "Nat.Prime 17",
+    "lean_statement": "example : Nat.Prime 17 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "17"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_008",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 19 prime?",
+    "correct_answer": "Nat.Prime 19",
+    "lean_statement": "example : Nat.Prime 19 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "19"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_009",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 23 prime?",
+    "correct_answer": "Nat.Prime 23",
+    "lean_statement": "example : Nat.Prime 23 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "23"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_010",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 29 prime?",
+    "correct_answer": "Nat.Prime 29",
+    "lean_statement": "example : Nat.Prime 29 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "29"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_011",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 31 prime?",
+    "correct_answer": "Nat.Prime 31",
+    "lean_statement": "example : Nat.Prime 31 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "31"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_012",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 37 prime?",
+    "correct_answer": "Nat.Prime 37",
+    "lean_statement": "example : Nat.Prime 37 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "37"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_013",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 41 prime?",
+    "correct_answer": "Nat.Prime 41",
+    "lean_statement": "example : Nat.Prime 41 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "41"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_014",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 43 prime?",
+    "correct_answer": "Nat.Prime 43",
+    "lean_statement": "example : Nat.Prime 43 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "43"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "num_015",
+    "source": "Egyptian Grade 10 Number Theory",
+    "category": "number_theory",
+    "template_id": "number_theory",
+    "problem_text": "Is 47 prime?",
+    "correct_answer": "Nat.Prime 47",
+    "lean_statement": "example : Nat.Prime 47 := by decide",
+    "lean_verified": true,
+    "slot_values": {
+      "n": "47"
+    },
+    "difficulty": "easy",
+    "notes": "Nat.Prime decidability"
+  },
+  {
+    "id": "geom_001",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between the points (1, 2) and (4, 6)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((4 - 1)^2 + (6 - 2)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "1",
+      "y1": "2",
+      "x2": "4",
+      "y2": "6",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_002",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (0, 0) and (3, 4)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((3 - 0)^2 + (4 - 0)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "0",
+      "y1": "0",
+      "x2": "3",
+      "y2": "4",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_003",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (1, 1) and (4, 5)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((4 - 1)^2 + (5 - 1)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "1",
+      "y1": "1",
+      "x2": "4",
+      "y2": "5",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_004",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between points (2, 3) and (8, 11)",
+    "correct_answer": "10",
+    "lean_statement": "example : Real.sqrt ((8 - 2)^2 + (11 - 3)^2) = 10 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "2",
+      "y1": "3",
+      "x2": "8",
+      "y2": "11",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_005",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "What is the distance between (0, 0) and (6, 8)?",
+    "correct_answer": "10",
+    "lean_statement": "example : Real.sqrt ((6 - 0)^2 + (8 - 0)^2) = 10 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "0",
+      "y1": "0",
+      "x2": "6",
+      "y2": "8",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_006",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Calculate the distance between (3, 2) and (6, 6)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((6 - 3)^2 + (6 - 2)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "3",
+      "y1": "2",
+      "x2": "6",
+      "y2": "6",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_007",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (0, 0) and (5, 12)",
+    "correct_answer": "13",
+    "lean_statement": "example : Real.sqrt ((5 - 0)^2 + (12 - 0)^2) = 13 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "0",
+      "y1": "0",
+      "x2": "5",
+      "y2": "12",
+      "answer": "13"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_008",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between points (2, 1) and (7, 13)",
+    "correct_answer": "13",
+    "lean_statement": "example : Real.sqrt ((7 - 2)^2 + (13 - 1)^2) = 13 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "2",
+      "y1": "1",
+      "x2": "7",
+      "y2": "13",
+      "answer": "13"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_009",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (-1, -1) and (2, 3)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((2 - -1)^2 + (3 - -1)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "-1",
+      "y1": "-1",
+      "x2": "2",
+      "y2": "3",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_010",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (1, 2) and (7, 10)",
+    "correct_answer": "10",
+    "lean_statement": "example : Real.sqrt ((7 - 1)^2 + (10 - 2)^2) = 10 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "1",
+      "y1": "2",
+      "x2": "7",
+      "y2": "10",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_011",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (0, 0) and (9, 12)",
+    "correct_answer": "15",
+    "lean_statement": "example : Real.sqrt ((9 - 0)^2 + (12 - 0)^2) = 15 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "0",
+      "y1": "0",
+      "x2": "9",
+      "y2": "12",
+      "answer": "15"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_012",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Calculate the distance between (4, 5) and (10, 13)",
+    "correct_answer": "10",
+    "lean_statement": "example : Real.sqrt ((10 - 4)^2 + (13 - 5)^2) = 10 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "4",
+      "y1": "5",
+      "x2": "10",
+      "y2": "13",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_013",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (2, 2) and (5, 6)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((5 - 2)^2 + (6 - 2)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "2",
+      "y1": "2",
+      "x2": "5",
+      "y2": "6",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_014",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (1, 3) and (9, 9)",
+    "correct_answer": "10",
+    "lean_statement": "example : Real.sqrt ((9 - 1)^2 + (9 - 3)^2) = 10 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "1",
+      "y1": "3",
+      "x2": "9",
+      "y2": "9",
+      "answer": "10"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_015",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (0, 0) and (8, 15)",
+    "correct_answer": "17",
+    "lean_statement": "example : Real.sqrt ((8 - 0)^2 + (15 - 0)^2) = 17 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "0",
+      "y1": "0",
+      "x2": "8",
+      "y2": "15",
+      "answer": "17"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  },
+  {
+    "id": "geom_016",
+    "source": "Egyptian Grade 10 Coordinate Geometry",
+    "category": "geometry_distance",
+    "template_id": "geometry_distance",
+    "problem_text": "Find the distance between (-2, 1) and (1, 5)",
+    "correct_answer": "5",
+    "lean_statement": "example : Real.sqrt ((1 - -2)^2 + (5 - 1)^2) = 5 := by\n  norm_num [Real.sqrt_eq_iff_sq_eq, sq_abs]",
+    "lean_verified": true,
+    "slot_values": {
+      "x1": "-2",
+      "y1": "1",
+      "x2": "1",
+      "y2": "5",
+      "answer": "5"
+    },
+    "difficulty": "medium",
+    "notes": "Pythagorean coordinate distance"
+  }
+]

@@ -1,0 +1,15 @@
+[Unit]
+Description=VeriMath MQTT to Firestore Telemetry Sync
+After=network.target mosquitto.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/verimath
+EnvironmentFile=/home/pi/verimath/.env
+ExecStart=/home/pi/verimath/.venv/bin/python -m backend.iot.firestore_sync
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
