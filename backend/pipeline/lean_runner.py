@@ -65,8 +65,14 @@ _LEAN_FILE_HEADER = """\
 import Mathlib.Tactic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.MeasureTheory.Integral.IntervalIntegral
+import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 import Mathlib.Data.Nat.Prime.Basic
+
+set_option linter.unusedSimpArgs false
+set_option linter.unusedTactic false
 
 -- VeriMath auto-generated verification file
 -- DO NOT EDIT manually

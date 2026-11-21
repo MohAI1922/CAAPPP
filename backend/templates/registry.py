@@ -121,7 +121,7 @@ TEMPLATE_LIST: list[Template] = [
         ],
         lean_template=(
             "example (x : ℝ) : deriv (fun x => {expr}) x = {answer} := by\n"
-            "  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n"
+            "  simp (disch := fun_prop) [deriv_comp, deriv_mul, deriv_add, deriv_sub, deriv_div, deriv_pow, Real.deriv_sin, Real.deriv_cos, Real.deriv_exp, Real.deriv_log]\n"
             "  ring"
         ),
         tactic="simp+ring",
@@ -151,7 +151,10 @@ TEMPLATE_LIST: list[Template] = [
             "evaluate the integral",
         ],
         lean_template=(
-            "example : ∫ x in ({lower} : ℝ)..{upper}, {expr} = {answer} := by norm_num"
+            "example : ∫ x in ({lower} : ℝ)..{upper}, {expr} = {answer} := by\n"
+            "  try simp [intervalIntegral.integral_const_mul, integral_id, integral_pow, integral_sin, integral_cos, integral_exp]\n"
+            "  try rw [intervalIntegral.integral_const_mul, integral_id]\n"
+            "  all_goals norm_num"
         ),
         tactic="norm_num",
         prompt_hint=(
@@ -178,7 +181,7 @@ TEMPLATE_LIST: list[Template] = [
         ],
         lean_template=(
             "example (x : ℝ) : deriv (fun x => {antideriv}) x = {expr} := by\n"
-            "  simp [deriv_mul, deriv_pow, deriv_sin, deriv_cos, deriv_exp, deriv_log]\n"
+            "  simp (disch := fun_prop) [deriv_comp, deriv_mul, deriv_add, deriv_sub, deriv_div, deriv_pow, Real.deriv_sin, Real.deriv_cos, Real.deriv_exp, Real.deriv_log]\n"
             "  ring"
         ),
         tactic="simp+ring",
@@ -1601,9 +1604,9 @@ TEMPLATE_LIST: list[Template] = [
             "maximize the enclosed area", "maximum possible area", "fencing to enclose",
         ],
         lean_template=(
-            "example : 2 * ({x} : ℝ) + {y} = {L} ∧ ({x} : ℝ) * {y} = {max_area} ∧ ({L} : ℝ) - 4 * {x} = 0 := by ring"
+            "example : 2 * ({x} : ℝ) + {y} = {L} ∧ ({x} : ℝ) * {y} = {max_area} ∧ ({L} : ℝ) - 4 * {x} = 0 := by norm_num"
         ),
-        tactic="ring",
+        tactic="norm_num",
         prompt_hint="Calculus optimization: Finds dimensions x (perpendicular) and y (parallel) and maximum area for a 3-sided rectangular pasture of perimeter L.",
         slots=["L", "x", "y", "max_area"],
         back_translation_template=(
@@ -2404,7 +2407,7 @@ TEMPLATE_LIST: list[Template] = [
             "point on the line y =", "point on line", "closest point on the line",
         ],
         lean_template=(
-            "example : ({y} : ℝ) = {m} * {x} + {b} ∧ ({x} - {x0}) + {m} * ({y} - {y0}) = 0 ∧ ({x} - {x0})^2 + ({y} - {y0})^2 = {dist_sq} := by norm_num"
+            "example : ({y} : ℝ) = {m} * {x} + {b} ∧ (({x} : ℝ) - {x0}) + {m} * (({y} : ℝ) - {y0}) = 0 ∧ ({x} - {x0})^2 + ({y} - {y0})^2 = {dist_sq} + (0 : ℝ) := by norm_num"
         ),
         tactic="norm_num",
         prompt_hint="Calculus optimization: Finds point (x, y) on a line y = mx + b closest to a given point (x0, y0) and the minimum distance.",
@@ -4154,9 +4157,9 @@ TEMPLATE_LIST: list[Template] = [
             "minimize the total outer perimeter", "minimize the outer perimeter", "minimize the perimeter",
         ],
         lean_template=(
-            "example : 2 * ({r} : ℝ) * {h} + (1/2 : ℝ) * Real.pi * ({r} : ℝ)^2 = {A_str} ∧ (4 + Real.pi : ℝ) * ({r} : ℝ)^2 = 2 * ({A_str}) ∧ 2 * ({r} : ℝ) + 2 * {h} + Real.pi * {r} = {P_min_exact} := by norm_num"
+            "example : 2 * ({r} : ℝ) * {h} + (1/2 : ℝ) * Real.pi * ({r} : ℝ)^2 = {A_str} ∧ (4 + Real.pi : ℝ) * ({r} : ℝ)^2 = 2 * ({A_str}) ∧ 2 * ({r} : ℝ) + 2 * {h} + Real.pi * {r} = {P_min_exact} := by\n  refine ⟨?_, ?_, ?_⟩ <;> (try norm_num) <;> ring"
         ),
-        tactic="norm_num",
+        tactic="norm_num+ring",
         prompt_hint="Calculus optimization: Finds radius r and rectangle height h that minimize total outer perimeter of a Norman window of fixed area A.",
         slots=["A_str", "r", "h", "P_min_exact", "P_min_val", "unit"],
         back_translation_template=(
@@ -4182,9 +4185,9 @@ TEMPLATE_LIST: list[Template] = [
             "maximize its volume", "maximum volume",
         ],
         lean_template=(
-            "example : ({r} : ℝ) / {R} + {h} / {H} = 1 ∧ 3 * ({r} : ℝ) = 2 * {R} ∧ (1/3 : ℝ) * Real.pi * ({r} : ℝ)^2 * {h} = {V_max_exact} := by norm_num"
+            "example : ({r} : ℝ) / {R} + {h} / {H} = 1 ∧ 3 * ({r} : ℝ) = 2 * {R} ∧ (1/3 : ℝ) * Real.pi * ({r} : ℝ)^2 * {h} = {V_max_exact} := by norm_num <;> ring"
         ),
-        tactic="norm_num",
+        tactic="norm_num+ring",
         prompt_hint="Calculus optimization: Inscribes upside-down cone inside larger cone R, H with apex at base center to maximize volume.",
         slots=["R", "H", "r", "h", "V_max_exact", "V_max_val", "unit_len", "unit_vol"],
         back_translation_template=(

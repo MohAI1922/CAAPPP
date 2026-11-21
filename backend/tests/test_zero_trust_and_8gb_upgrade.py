@@ -35,8 +35,9 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
 
     def test_strict_lean_mode_fails_closed_when_missing(self):
         with patch.dict(os.environ, {"VERIMATH_STRICT_LEAN": "true"}):
-            res = verify("example : 1 + 1 = 2 := by norm_num")
-            self.assertEqual(res.verdict, LeanVerdict.ENGINE_ERROR)
+            with patch("subprocess.run", side_effect=FileNotFoundError("lean not found")):
+                res = verify("example : 1 + 1 = 2 := by norm_num")
+                self.assertEqual(res.verdict, LeanVerdict.ENGINE_ERROR)
 
     def test_statement_judge_rejects_number_mismatch(self):
         f_res = FormalizerResult(

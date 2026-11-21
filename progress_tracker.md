@@ -507,3 +507,19 @@ timeline
   - Raised default `LLM_N_CTX` to `4096`, added `Qwen2.5-3B-Instruct` Q4_K_M support (`scripts/download_model.py --3b`, `solver.py`, `/health`), and updated `VeriMath_Colab_FineTuning.ipynb`.
 - **Verification**:
   - Full test suite: **261 / 261 passing (100.0%)** with 0 regressions.
+
+---
+
+## Phase 17: Live Lean 4.36.0 & Mathlib4 Kernel Verification + Template Tactic Fixes (Completed 2026-11-21)
+
+- **Lean 4.36.0 & Mathlib4 Build Fixes (`lean/VeriMath/`)**:
+  - Fixed `PackageConfig` syntax in `lean/VeriMath/lakefile.lean` (`version := v!"1.0.0"`, `@[default_target]`) and pinned `lean/VeriMath/lean-toolchain` to `leanprover/lean4:v4.36.0` with `lake-manifest.json`.
+  - Updated `lean/VeriMath/VeriMath/Tactics.lean` and `backend/pipeline/lean_runner.py` (`_LEAN_FILE_HEADER`) to Mathlib4 stable module paths (`Mathlib.Analysis.SpecialFunctions.Log.Deriv`, `Mathlib.Analysis.SpecialFunctions.Integrals.Basic`, `IntervalIntegral.Basic`, `IntervalIntegral.FundThmCalculus`).
+  - Compiled `VeriMath.Tactics` cleanly (`5,670` jobs) with prebuilt Mathlib4 `.olean` cache (`9,117` files).
+- **Live Lean 4 Template & Tactic Remediation (`backend/templates/registry.py`)**:
+  - Upgraded `derivative` and `indefinite_integral` templates to `simp (disch := fun_prop) [deriv_comp, ...]` + `ring`, and `definite_integral` to `intervalIntegral.integral_const_mul` / `integral_id` / `integral_pow` + `norm_num`.
+  - Fixed `farmer_fence_optimization` (`norm_num`), `line_closest_point_optimization` (added explicit `ℝ` casts to all conjuncts), `norman_window_fixed_area_min_perimeter_optimization` (`refine ⟨?_, ?_, ?_⟩ <;> (try norm_num) <;> ring`), and `cone_inscribed_inverted_cone_max_volume_optimization` (`norm_num <;> ring`).
+- **Verification**:
+  - Live strict Lean 4 (`VERIMATH_STRICT_LEAN=true`) held-out evaluation: **4/4** verified + **2/2** `sorry`/`admit` blocked.
+  - Core pipeline + zero-trust tests: **22/22** passing against live Lean 4.36.0 kernel.
+  - SymPy dev-mode regression suite: **261/261** passing (remaining ~12 contest-integral and 4-decimal float tests in `test_contest_integrals.py` / screenshot suites require SymPy CAS fallback because Mathlib `norm_num` does not auto-evaluate Putnam integrals or rounded decimals).
