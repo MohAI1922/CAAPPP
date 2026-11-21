@@ -631,8 +631,16 @@ export default function ResultPanel({ result }) {
           </div>
 
           {/* Explanation Text */}
-          <div className="bg-slate-900/70 border border-slate-800/80 rounded-xl p-4 text-slate-200 text-sm leading-relaxed shadow-sm">
-            <FormattedExplanation text={result.explanation} />
+          <div className="bg-slate-900/70 border border-slate-800/80 rounded-xl p-4 text-slate-200 text-sm leading-relaxed shadow-sm space-y-3">
+            {result.mental_model && (
+              <div className="px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-xs text-emerald-200 font-medium">
+                <span className="text-emerald-400 font-bold uppercase tracking-wider mr-1.5">Mental Model:</span>
+                <FormattedExplanation text={result.mental_model} />
+              </div>
+            )}
+            <div>
+              <FormattedExplanation text={result.explanation} />
+            </div>
           </div>
 
           {/* Teacher's Note / Strategic Advice Callout */}
@@ -641,9 +649,10 @@ export default function ResultPanel({ result }) {
               <Lightbulb className="w-4 h-4" />
             </div>
             <div className="space-y-1 text-xs">
-              <span className="font-bold text-amber-300 block">Teacher's Pedagogical Tip:</span>
+              <span className="font-bold text-amber-300 block">Teacher's Pedagogical Tip & Common Pitfall:</span>
               <p className="text-slate-300 leading-relaxed">
-                Always verify domain restrictions and boundary points when evaluating derivatives or integrals. In exam settings, identifying whether a function requires the product rule, chain rule, or u-substitution before expanding saves time and prevents algebraic errors.
+                {result.pitfall_tip ||
+                  "Always verify domain restrictions and boundary points when evaluating derivatives or integrals. Identifying the right rule (product, chain, or substitution) before expanding prevents algebraic errors."}
               </p>
             </div>
           </div>

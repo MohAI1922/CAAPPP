@@ -15,6 +15,7 @@ from backend.pipeline.lean_runner import verify, LeanVerdict, _has_lean_errors
 from backend.pipeline.formalizer import FormalizerResult
 from backend.pipeline.statement_judge import judge, _check_semantic_inversions
 from backend.pipeline.step_grader import grade_student_steps
+from backend.pipeline.explainer import explain, build_intuitive_guide
 
 
 class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
@@ -121,6 +122,30 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
             )
             self.assertEqual(r.status_code, 200)
             self.assertTrue(r.json()["overall_correct"])
+
+    def test_intuitive_explainer_layer_and_sanitization(self):
+        g_prod = build_intuitive_guide(
+            "Find the derivative of x^2 * sin(x)",
+            "2*x * Real.sin x + x^2 * Real.cos x",
+            "According to El-Moasser, verified by Lean 4.",
+            template_id="derivative",
+        )
+        self.assertIn("First", g_prod.mental_model)
+        self.assertIn("derivative of Second", g_prod.mental_model)
+        for forbidden in ("Real.", "Lean", "El-Moasser", "Book of Integrals", "Senior 3"):
+            self.assertNotIn(forbidden.lower(), g_prod.full_explanation.lower())
+
+        txt = explain("Evaluate the integral of sin(x)/(sin(x)+cos(x)) from 0 to pi/2", "pi/4", template_id="kings_rule_integral")
+        self.assertIn("Symmetry", txt)
+        self.assertIn("pi/4", txt)
+
+        with TestClient(app) as client:
+            r = client.post("/solve", json={"problem": "Integrate: x^2 * sqrt(x^3 + 4) dx"})
+            self.assertEqual(r.status_code, 200)
+            data = r.json()
+            self.assertTrue(data["explanation"])
+            self.assertTrue(data["mental_model"])
+            self.assertTrue(data["pitfall_tip"])
 
 
 if __name__ == "__main__":

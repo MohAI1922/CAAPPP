@@ -45,7 +45,7 @@ from backend.pipeline.solver import solve
 from backend.pipeline.formalizer import formalize
 from backend.pipeline.statement_judge import judge
 from backend.pipeline.lean_runner import verify_async, warmup, LeanVerdict
-from backend.pipeline.explainer import explain
+from backend.pipeline.explainer import explain, build_intuitive_guide
 from backend.pipeline import cache as demo_cache
 from backend.pipeline.step_generator import generate_steps
 
@@ -150,6 +150,8 @@ class SolveResponse(BaseModel):
     lean_statement: Optional[str] = None
     back_translation: Optional[str] = None
     explanation: Optional[str] = None
+    mental_model: Optional[str] = None
+    pitfall_tip: Optional[str] = None
     steps: Optional[List[Dict[str, Any]]] = None
     rejection_reason: Optional[str] = None
     template_id: Optional[str] = None
@@ -1433,13 +1435,21 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
             student_id=req.student_id,
         )
         cached_steps = [s.model_dump() for s in generate_steps(cached.template_id, problem, cached.verified_answer)]
+        cached_guide = build_intuitive_guide(
+            problem=problem,
+            verified_answer=cached.verified_answer,
+            reasoning=cached.explanation or "",
+            template_id=cached.template_id,
+        )
         return SolveResponse(
             status="VERIFIED",
             verified_answer=_clean_lean_syntax(cached.verified_answer),
             latex_answer=to_latex(cached.verified_answer),
             lean_statement=cached.lean_statement,
             back_translation=_clean_lean_syntax(cached.back_translation),
-            explanation=cached.explanation,
+            explanation=cached_guide.full_explanation,
+            mental_model=cached_guide.mental_model,
+            pitfall_tip=cached_guide.pitfall_tip,
             steps=cached_steps,
             template_id=cached.template_id,
             elapsed_ms=elapsed_ms,
@@ -1510,11 +1520,18 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
             logger.info(f"Lean [{attempt}]: {lean_result.verdict} in {lean_result.elapsed_ms}ms")
 
             if lean_result.verdict == LeanVerdict.VERIFIED:
-                # Step 6: Explain
+                # Step 6: Explain (Intuitive Textbook Pedagogy Layer)
+                guide = build_intuitive_guide(
+                    problem=problem,
+                    verified_answer=solver_result.candidate_answer,
+                    reasoning=solver_result.reasoning,
+                    template_id=template_id,
+                )
                 explanation = explain(
                     problem=problem,
                     verified_answer=solver_result.candidate_answer,
                     reasoning=solver_result.reasoning,
+                    template_id=template_id,
                 )
 
                 elapsed_ms = int((time.monotonic() - pipeline_start) * 1000)
@@ -1561,6 +1578,8 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
                     lean_statement=formalizer_result.lean_statement,
                     back_translation=_clean_lean_syntax(judge_result.back_translation),
                     explanation=explanation,
+                    mental_model=guide.mental_model,
+                    pitfall_tip=guide.pitfall_tip,
                     steps=steps_dicts,
                     template_id=template_id,
                     elapsed_ms=elapsed_ms,

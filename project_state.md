@@ -12,7 +12,7 @@
 * **Rule 3 (Cumulative Progress Tracking)**: Maintain [`progress_tracker.md`](file:///d:/New%20folder%20(3)/verimath/progress_tracker.md) as the immutable historical log from project inception to date, appending each completed milestone.
 * **Rule 4 (Strict Open-Response Standard)**: Never present, accept, or generate multiple-choice options (A, B, C, D). All mathematical problems must be formulated and evaluated in open-response format.
 * **Rule 5 (Edge Hardware SLA)**: All core components must run offline on edge hardware (Raspberry Pi 4 CPU, 4 threads, 2048 ctx) with $\le 4\text{ ms}$ latency via the pre-seeded SQLite cache ([`demo_cache.db`](file:///d:/New%20folder%20(3)/verimath/demo_cache.db)).
-* **Rule 6 (Zero Regression Guarantee)**: The complete test suite ([`backend/tests/`](file:///d:/New%20folder%20(3)/verimath/backend/tests/)) must maintain a 100.0% pass rate at all times (currently 261/261 passing tests).
+* **Rule 6 (Zero Regression Guarantee)**: The complete test suite ([`backend/tests/`](file:///d:/New%20folder%20(3)/verimath/backend/tests/)) must maintain a 100.0% pass rate at all times (currently 262/262 passing tests).
 
 ### Mathematical & Engineering Rules
 * **Rule 7 (Neurosymbolic Division of Labor)**: Neural models (Qwen2.5-1.5B) parse informal English intent and populate structured JSON slots; the deterministic CAS engine (SymPy) solves and simplifies; Lean 4 mechanically checks proofs. Never rely on probabilistic LLMs for multi-step algebraic or coefficient calculations.
@@ -81,7 +81,7 @@ Columns: `(problem_key, problem_text, template_id, verified_answer, lean_stateme
 | **Fine-Tuning Dataset Size** | **10,311 entries** | 244/244 templates (100% coverage), 0 `sorry` placeholders, 143 corrupted `implicit_derivative` labels recomputed via SymPy |
 | **Edge Cache Entries** | **1,828 entries** | Sanitized of all Lean syntax in student fields, pre-seeded for $\le 4\text{ ms}$ offline edge demo |
 | **Pedagogical Step Engine** | **Remediated & Verified (100% Complete)** | Deterministic CAS step generator + SymPy student multi-step derivation grader (`POST /grade-steps`), zero Lean syntax in student views, zero KaTeX errors |
-| **Unit Test Suite** | **261 / 261 passing** | 100.0% pass rate (0 failures, 0 regressions across all 14 test suites including semantic inversion & step grader checks) |
+| **Unit Test Suite** | **262 / 262 passing** | 100.0% pass rate (0 failures, 0 regressions across all 14 test suites including intuitive explainer, semantic inversion & step grader checks) |
 | **Textbook Verification** | **100.0% Verified** | Cross-verified against official Answer Keys (El-Moasser & *Book of Integrals*) with zero discrepancies |
 | **Target Hardware** | **Raspberry Pi 4 (8 GB RAM)** | 4 threads, 4096 context, Qwen2.5-1.5B or 3B Q4_K_M GGUF + Lean 4 Mathlib |
 

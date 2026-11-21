@@ -523,3 +523,16 @@ timeline
   - Live strict Lean 4 (`VERIMATH_STRICT_LEAN=true`) held-out evaluation: **4/4** verified + **2/2** `sorry`/`admit` blocked.
   - Core pipeline + zero-trust tests: **22/22** passing against live Lean 4.36.0 kernel.
   - SymPy dev-mode regression suite: **261/261** passing (remaining ~12 contest-integral and 4-decimal float tests in `test_contest_integrals.py` / screenshot suites require SymPy CAS fallback because Mathlib `norm_num` does not auto-evaluate Putnam integrals or rounded decimals).
+
+---
+
+## Phase 18: Curriculum-Aligned Intuitive Explainer Layer (Completed 2026-11-21)
+
+- **Intuitive Textbook Pedagogy Engine (`backend/pipeline/explainer.py`)**:
+  - Built `INTUITIVE_CONCEPT_GUIDES` & `build_intuitive_guide()` covering 19 calculus, integration, related-rates, optimization, and algebra families with verbal mnemonics, geometric/physical mental models, and common pitfall/exam tips.
+  - Enforced strict Rule 22 (`Real.` / Lean syntax isolation) and Rule 23 (zero external textbook names or page citations in student-facing output), with optional `EXPLAINER_USE_LLM=true` prose polishing.
+- **API & Frontend Integration (`backend/main.py`, `frontend/src/components/ResultPanel.jsx`)**:
+  - Exposed `mental_model` and `pitfall_tip` in `SolveResponse` on both live solves and `< 1 ms` cache hits.
+  - Updated `ResultPanel.jsx` to display the problem-specific **Mental Model** banner and dynamic **Teacher's Pedagogical Tip & Common Pitfall**, rebuilt production bundle (`133.03 kB` JS).
+- **Verification**:
+  - Full test suite: **262 / 262 passing (100.0%)** in `12.368s`.
