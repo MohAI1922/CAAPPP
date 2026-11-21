@@ -1652,6 +1652,7 @@ async def health():
     if not model_path:
         candidates = [
             os.path.join(models_dir, "qwen2_5_1_5b_verimath_pi4-q4_k_m.gguf"),
+            os.path.join(models_dir, "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf"),
             os.path.join(models_dir, "qwen2.5-3b-instruct-q4_k_m.gguf"),
             os.path.join(models_dir, "qwen2.5-1.5b-instruct-q4_k_m.gguf"),
             os.path.join(models_dir, "phi-3-mini-4k-instruct-q4.gguf"),
