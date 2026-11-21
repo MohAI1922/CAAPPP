@@ -646,3 +646,23 @@ timeline
   - Frontend production build (`npm --prefix frontend run build`): exited with code `0`.
   - Full SymPy dev-mode regression suite: **269 / 269 passing (100.0%)** in `15.125s`.
   - Live Lean 4.36.0 strict End-to-End smoke check (`/app/`, `/health`, `/solve` complex verified, `/solve` false identity Lean-verified counterexample, `/grade-steps` Lean `calc` certification & `dropped_root_error`, `/dashboard/*`): **E2E_UI_AND_API_SMOKE_OK**.
+
+---
+
+## Phase 26: External Connectors, Camera Question/Answer Scanning & Handwriting Recognition (Completed 2026-11-21)
+
+- **Multi-Engine Camera & Handwriting OCR Connector (`backend/connectors/vision_ocr.py`, `backend/connectors/__init__.py`)**:
+  - Implemented `preprocess_math_image()` (EXIF auto-rotation, 2.5× LANCZOS upscaling for exponents, autocontrast, and sharpness enhancement) and `_normalize_ocr_line()` (fixing `x~2` → `x^2`, glued verbs, Unicode operators).
+  - Integrated pretrained **RapidOCR PP-OCRv4 (ONNX)** (`rapidocr-onnxruntime`), **Tesseract 5 LSTM** (`tesseract-ocr` + `pytesseract`), and optional adapters for **TrOCR (`microsoft/trocr-base-handwritten`)**, **Pix2Tex (`LaTeX-OCR`)**, and **Gemini Vision** behind a unified untrusted sensor interface so OCR text still passes AST Faithfulness + SymPy + Lean 4 kernel checks.
+  - Added Raspberry Pi CSI (`rpicam-still`/`libcamera-still`) & USB V4L2 (`fswebcam`/`cv2`) hardware camera capture (`capture_hardware_camera_frame()`) and live connector readiness telemetry (`get_connectors_status()`).
+- **FastAPI Scan & Connector Routes (`backend/main.py`)**:
+  - Added `/scan/ocr`, `/scan/solve`, `/scan/grade-steps`, `/scan/hardware-capture`, `/connectors/status`, and exposed `connectors` readiness inside `/health` (supporting both `multipart/form-data` uploads and base64 camera snapshots).
+- **MQTT v2 Connector Fix & Config (`backend/iot/firestore_sync.py`, `requirements.txt`, `.env.example`, `deployment/install_pi.sh`)**:
+  - Upgraded `backend/iot/firestore_sync.py` to `paho.mqtt.client.CallbackAPIVersion.VERSION2` matching `mqtt_publisher.py`.
+  - Added `Pillow`, `python-multipart`, `pytesseract`, `rapidocr-onnxruntime`, `tesseract-ocr`, and `fswebcam` to project dependencies and Pi install automation.
+- **React Scanner Modal & Telemetry UI (`frontend/src/components/CameraScannerModal.jsx`, `ProblemInput.jsx`, `StepGraderPanel.jsx`, `StudentView.jsx`, `DashboardView.jsx`)**:
+  - Built [`CameraScannerModal.jsx`](file:///home/antigravity/MohAI1922/CAAPPP/frontend/src/components/CameraScannerModal.jsx) supporting browser WebRTC live camera (`getUserMedia`), Pi/USB hardware camera trigger, drag-and-drop image upload, OCR engine selection, and editable math preview wired into both **Solve & Prove** and **Check My Steps**.
+  - Surfaced live external connector & peripheral readiness in [`DashboardView.jsx`](file:///home/antigravity/MohAI1922/CAAPPP/frontend/src/pages/DashboardView.jsx); rebuilt production bundle (`140.79 kB` JS).
+- **Verification**:
+  - Live Lean 4.36.0 (`VERIMATH_STRICT_LEAN=true backend.tests.test_vision_and_connectors`): **4 / 4 test suites passing** in `21.064s` (RapidOCR/Tesseract rendered math scanning + `/scan/ocr` + `/scan/solve` + `/scan/grade-steps` + `/connectors/status` + MQTT v2 callbacks).
+  - Full SymPy dev-mode regression suite: **273 / 273 passing (100.0%)** in `23.772s`.

@@ -22,6 +22,7 @@ Key guarantee:
 
 from __future__ import annotations
 
+import base64
 import logging
 import os
 import re
@@ -29,7 +30,7 @@ import time
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -1790,6 +1791,170 @@ async def grade_steps_endpoint(req: GradeStepsRequest):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# External Camera, Handwriting & Math OCR Connectors
+# ─────────────────────────────────────────────────────────────────────────────
+
+async def _extract_scan_request(request: Request) -> tuple[bytes, dict]:
+    """Read raw image bytes + options from either multipart/form-data upload or JSON base64 payload."""
+    ctype = (request.headers.get("content-type") or "").lower()
+    if "multipart/form-data" in ctype:
+        form = await request.form()
+        up = form.get("file")
+        if up is None or not hasattr(up, "read"):
+            raise HTTPException(status_code=400, detail="Missing 'file' upload in multipart form data.")
+        img_bytes = await up.read()
+        opts = {
+            "scan_mode": str(form.get("scan_mode") or "auto"),
+            "engine": str(form.get("engine") or "auto"),
+            "enhance_handwriting": str(form.get("enhance_handwriting") or "true").lower() in ("1", "true", "yes"),
+            "lean_certify": str(form.get("lean_certify") or "false").lower() in ("1", "true", "yes"),
+            "operation": str(form.get("operation") or "auto"),
+            "student_id": str(form.get("student_id") or "anonymous"),
+        }
+    else:
+        try:
+            body = await request.json()
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid request body: {e}")
+        b64 = body.get("image_base64") or ""
+        if not b64:
+            raise HTTPException(status_code=400, detail="Missing 'image_base64' field.")
+        if "," in b64 and b64.strip().startswith("data:"):
+            b64 = b64.split(",", 1)[1]
+        try:
+            img_bytes = base64.b64decode(b64)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid base64 image data: {e}")
+        opts = {
+            "scan_mode": str(body.get("scan_mode", "auto")),
+            "engine": str(body.get("engine", "auto")),
+            "enhance_handwriting": bool(body.get("enhance_handwriting", True)),
+            "lean_certify": bool(body.get("lean_certify", False)),
+            "operation": str(body.get("operation", "auto")),
+            "student_id": str(body.get("student_id", "anonymous")),
+        }
+
+    if not img_bytes:
+        raise HTTPException(status_code=400, detail="Empty image payload.")
+    return img_bytes, opts
+
+
+@app.post("/scan/ocr")
+async def scan_ocr_endpoint(request: Request):
+    """Extract math question & handwritten/printed steps from an uploaded or camera-captured image."""
+    from backend.connectors.vision_ocr import extract_math_from_image
+
+    img_bytes, opts = await _extract_scan_request(request)
+    try:
+        res = extract_math_from_image(
+            img_bytes,
+            engine=opts["engine"],
+            scan_mode=opts["scan_mode"],
+            enhance_handwriting=opts["enhance_handwriting"],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not decode or process image: {e}")
+    return res.to_dict()
+
+
+@app.post("/scan/solve")
+async def scan_solve_endpoint(request: Request):
+    """Scan a math question image, extract the problem via OCR, and verify/solve it in Lean 4."""
+    from backend.connectors.vision_ocr import extract_math_from_image
+
+    img_bytes, opts = await _extract_scan_request(request)
+    try:
+        ocr_res = extract_math_from_image(
+            img_bytes,
+            engine=opts["engine"],
+            scan_mode="question",
+            enhance_handwriting=opts["enhance_handwriting"],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Image OCR failed: {e}")
+
+    if not ocr_res.problem_text.strip():
+        return {
+            "ocr": ocr_res.to_dict(),
+            "solve": SolveResponse(
+                status="UNSUPPORTED",
+                rejection_reason="No readable mathematical text detected in scanned image.",
+                elapsed_ms=ocr_res.elapsed_ms,
+            ).model_dump(),
+        }
+
+    solve_res = await solve_endpoint(
+        SolveRequest(problem=ocr_res.problem_text, student_id=opts["student_id"])
+    )
+    return {
+        "ocr": ocr_res.to_dict(),
+        "solve": solve_res.model_dump(),
+    }
+
+
+@app.post("/scan/grade-steps")
+async def scan_grade_steps_endpoint(request: Request):
+    """Scan a handwritten problem + solution sheet and grade every derivation step."""
+    from backend.connectors.vision_ocr import extract_math_from_image
+    from backend.pipeline.step_grader import grade_student_steps
+
+    img_bytes, opts = await _extract_scan_request(request)
+    try:
+        ocr_res = extract_math_from_image(
+            img_bytes,
+            engine=opts["engine"],
+            scan_mode="question_and_answer",
+            enhance_handwriting=opts["enhance_handwriting"],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Image OCR failed: {e}")
+
+    steps = ocr_res.detected_steps if ocr_res.detected_steps else ([ocr_res.problem_text] if ocr_res.problem_text else [])
+    grade_res = grade_student_steps(
+        problem=ocr_res.problem_text or "Handwritten derivation",
+        student_steps=steps,
+        operation=opts["operation"],
+    )
+    if opts["lean_certify"] and grade_res.overall_correct and grade_res.lean_certificate:
+        lean_res = await verify_async(grade_res.lean_certificate)
+        grade_res.lean_verified = lean_res.verdict == LeanVerdict.VERIFIED
+
+    return {
+        "ocr": ocr_res.to_dict(),
+        "grade": grade_res.to_dict(),
+    }
+
+
+@app.post("/scan/hardware-capture")
+async def scan_hardware_capture_endpoint(
+    device: Optional[str] = None,
+    scan_mode: str = "auto",
+    engine: str = "auto",
+):
+    """Capture a frame from an attached Raspberry Pi CSI or USB V4L2 camera and run OCR."""
+    from backend.connectors.vision_ocr import capture_hardware_camera_frame, extract_math_from_image
+
+    try:
+        img_bytes = capture_hardware_camera_frame(device=device)
+        ocr_res = extract_math_from_image(img_bytes, engine=engine, scan_mode=scan_mode)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Hardware capture error: {e}")
+
+    payload = ocr_res.to_dict()
+    payload["captured_image_base64"] = "data:image/jpeg;base64," + base64.b64encode(img_bytes).decode("ascii")
+    return payload
+
+
+@app.get("/connectors/status")
+async def connectors_status_endpoint():
+    """Report readiness of all external camera, OCR/handwriting, MQTT, Firebase, and Gemini connectors."""
+    from backend.connectors.vision_ocr import get_connectors_status
+    return get_connectors_status()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Health check
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -1797,6 +1962,7 @@ async def grade_steps_endpoint(req: GradeStepsRequest):
 async def health():
     """System health check — used by install script and monitoring."""
     import shutil
+    from backend.connectors.vision_ocr import get_connectors_status
 
     lean_installed = shutil.which("lean") is not None or shutil.which("lake") is not None
     models_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
@@ -1813,6 +1979,7 @@ async def health():
     model_exists = os.path.exists(model_path)
 
     cache_count = len(demo_cache.list_all())
+    conn_status = get_connectors_status()
 
     return {
         "status": "ok",
@@ -1822,6 +1989,7 @@ async def health():
         "target_hardware": "Raspberry Pi 4 (8 GB RAM)",
         "demo_cache_size": cache_count,
         "supported_templates": list(TEMPLATES.keys()),
+        "connectors": conn_status,
     }
 
 

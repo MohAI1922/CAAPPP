@@ -1,5 +1,6 @@
-import React from 'react';
-import { Send, Sparkles, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Sparkles, X, Camera } from 'lucide-react';
+import CameraScannerModal from './CameraScannerModal';
 
 const PRESET_EXAMPLES = [
   { label: "Product Rule x² sin(x)", text: "Find the derivative of x² sin(x) with respect to x", kind: "template" },
@@ -13,7 +14,9 @@ const PRESET_EXAMPLES = [
   { label: "False Prime 91 (Disprove!)", text: "Prove that 91 is prime", kind: "disprove" },
 ];
 
-export default function ProblemInput({ problem, setProblem, onSubmit, isLoading }) {
+export default function ProblemInput({ apiBaseUrl = '', problem, setProblem, onSubmit, isLoading }) {
+  const [scannerOpen, setScannerOpen] = useState(false);
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -30,9 +33,20 @@ export default function ProblemInput({ problem, setProblem, onSubmit, isLoading 
           <span>Enter Math Problem</span>
           <span className="text-xs text-slate-500 font-normal">(Calculus, Algebra, Generalized Higher Math &amp; Claim Verification)</span>
         </label>
-        <span className="text-xs text-slate-400 hidden sm:flex items-center gap-1 font-mono">
-          Press <kbd className="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 text-[10px]">Enter ↵</kbd> to solve, <kbd className="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 text-[10px]">Shift+Enter</kbd> for newline
-        </span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setScannerOpen(true)}
+            disabled={isLoading}
+            className="text-xs px-2.5 py-1 rounded-lg bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-700/60 flex items-center gap-1.5 transition-colors"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span>Scan Photo / Camera</span>
+          </button>
+          <span className="text-xs text-slate-400 hidden md:flex items-center gap-1 font-mono">
+            Press <kbd className="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 text-[10px]">Enter ↵</kbd> to solve
+          </span>
+        </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
@@ -42,7 +56,7 @@ export default function ProblemInput({ problem, setProblem, onSubmit, isLoading 
             onChange={(e) => setProblem(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            placeholder="e.g. Find the derivative of x² sin(x), Compute (3 + 4i) * (1 - 2i), or test a false claim like Prove that (a + b)^2 = a^2 + b^2..."
+            placeholder="e.g. Find the derivative of x² sin(x), Compute (3 + 4i) * (1 - 2i), or scan a photo of handwritten math..."
             rows={3}
             className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl p-4 pr-10 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none font-mono text-sm"
           />
@@ -93,6 +107,19 @@ export default function ProblemInput({ problem, setProblem, onSubmit, isLoading 
           </button>
         </div>
       </form>
+
+      <CameraScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        apiBaseUrl={apiBaseUrl}
+        scanMode="question"
+        onApplyScan={({ problemText, autoSubmit }) => {
+          setProblem(problemText);
+          if (autoSubmit && problemText) {
+            onSubmit(null, problemText);
+          }
+        }}
+      />
     </div>
   );
 }

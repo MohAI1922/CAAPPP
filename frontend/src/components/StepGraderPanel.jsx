@@ -9,7 +9,9 @@ import {
   Terminal,
   ChevronDown,
   ChevronRight,
+  Camera,
 } from 'lucide-react';
+import CameraScannerModal from './CameraScannerModal';
 
 const PRESETS = [
   {
@@ -44,6 +46,7 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
   const [stepsText, setStepsText] = useState('');
   const [leanCertify, setLeanCertify] = useState(false);
   const [showCert, setShowCert] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [gradeResult, setGradeResult] = useState(null);
   const [error, setError] = useState(null);
@@ -54,14 +57,16 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
     }
   }, [initialProblem, problem]);
 
-  const handleGrade = async (e) => {
+  const handleGrade = async (e, overrideProblem = null, overrideSteps = null) => {
     if (e) e.preventDefault();
-    const stepLines = stepsText
+    const probStr = typeof overrideProblem === 'string' ? overrideProblem : problem;
+    const rawStepsStr = typeof overrideSteps === 'string' ? overrideSteps : stepsText;
+    const stepLines = rawStepsStr
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean);
 
-    if (!problem.trim() || stepLines.length === 0 || isLoading) return;
+    if (!probStr.trim() || stepLines.length === 0 || isLoading) return;
 
     setIsLoading(true);
     setError(null);
@@ -72,7 +77,7 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          problem: problem.trim(),
+          problem: probStr.trim(),
           student_steps: stepLines,
           operation,
           lean_certify: leanCertify,
@@ -114,6 +119,14 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setScannerOpen(true)}
+              className="text-xs px-2.5 py-1 rounded-lg bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-700/60 transition-colors flex items-center gap-1.5"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              Scan Handwritten Sheet
+            </button>
             {PRESETS.map((p) => (
               <button
                 key={p.label}
@@ -320,6 +333,20 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
           )}
         </div>
       )}
+
+      <CameraScannerModal
+        isOpen={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        apiBaseUrl={apiBaseUrl}
+        scanMode="question_and_answer"
+        onApplyScan={({ problemText, stepsText: scannedSteps, autoSubmit }) => {
+          setProblem(problemText);
+          setStepsText(scannedSteps);
+          if (autoSubmit && problemText && scannedSteps) {
+            handleGrade(null, problemText, scannedSteps);
+          }
+        }}
+      />
     </div>
   );
 }

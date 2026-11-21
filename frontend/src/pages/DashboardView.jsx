@@ -7,6 +7,7 @@ export default function DashboardView({ apiBaseUrl }) {
   const [stats, setStats] = useState(null);
   const [recent, setRecent] = useState([]);
   const [failures, setFailures] = useState([]);
+  const [connectors, setConnectors] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -16,10 +17,11 @@ export default function DashboardView({ apiBaseUrl }) {
     setLoading(true);
     setLoadError(null);
     try {
-      const [statsRes, recentRes, failRes] = await Promise.all([
+      const [statsRes, recentRes, failRes, connRes] = await Promise.all([
         fetch(`${apiBaseUrl}/dashboard/stats`),
         fetch(`${apiBaseUrl}/dashboard/recent?limit=15`),
         fetch(`${apiBaseUrl}/dashboard/failures`),
+        fetch(`${apiBaseUrl}/connectors/status`),
       ]);
 
       if (!statsRes.ok && !recentRes.ok) {
@@ -29,6 +31,7 @@ export default function DashboardView({ apiBaseUrl }) {
       if (statsRes.ok) setStats(await statsRes.json());
       if (recentRes.ok) setRecent(await recentRes.json());
       if (failRes.ok) setFailures(await failRes.json());
+      if (connRes.ok) setConnectors(await connRes.json());
     } catch (err) {
       setLoadError(err.message || 'Failed to reach VeriMath telemetry backend.');
     } finally {
@@ -143,6 +146,37 @@ export default function DashboardView({ apiBaseUrl }) {
           <div className="text-[11px] text-slate-500 mt-1">Cache target: ≤ 4 ms</div>
         </div>
       </div>
+
+      {/* External Connectors Readiness */}
+      {connectors && (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="font-semibold text-slate-300 flex items-center gap-2">
+            <span>External Connectors &amp; Peripherals:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 font-mono">
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-950/60 text-emerald-300 border border-emerald-700/50">
+              OCR Models: {(connectors.available_ocr_list || []).join(', ') || 'none'}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-cyan-950/60 text-cyan-300 border border-cyan-700/50">
+              Cameras: browser WebRTC{(connectors.hardware_cameras || []).length ? ` + ${connectors.hardware_cameras.join(', ')}` : ''}
+            </span>
+            <span className={`px-2.5 py-1 rounded-lg border ${
+              connectors.mqtt?.reachable
+                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-700/50'
+                : 'bg-slate-950 text-slate-400 border-slate-700'
+            }`}>
+              MQTT ({connectors.mqtt?.host}:{connectors.mqtt?.port}): {connectors.mqtt?.reachable ? 'online' : 'offline-safe'}
+            </span>
+            <span className={`px-2.5 py-1 rounded-lg border ${
+              connectors.firebase?.configured
+                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-700/50'
+                : 'bg-slate-950 text-slate-400 border-slate-700'
+            }`}>
+              Firebase: {connectors.firebase?.configured ? 'connected' : 'local-only'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Gemini AI Session Analysis */}
       <div className="bg-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl space-y-4">

@@ -26,7 +26,7 @@ cd "$WORKDIR"
 echo ""
 echo "[1/8] Updating package lists and installing dependencies..."
 sudo apt update
-sudo apt install -y curl git python3-pip python3-venv mosquitto mosquitto-clients nodejs npm build-essential cmake
+sudo apt install -y curl git python3-pip python3-venv mosquitto mosquitto-clients nodejs npm build-essential cmake tesseract-ocr fswebcam
 
 # Step 2: Mosquitto configuration
 echo ""

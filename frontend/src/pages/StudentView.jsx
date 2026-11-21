@@ -15,9 +15,10 @@ export default function StudentView({ apiBaseUrl }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, overrideProblem = null) => {
     if (e) e.preventDefault();
-    if (!problem.trim() || isLoading) return;
+    const targetProblem = typeof overrideProblem === 'string' ? overrideProblem : problem;
+    if (!targetProblem.trim() || isLoading) return;
 
     setIsLoading(true);
     setResult(null);
@@ -29,7 +30,7 @@ export default function StudentView({ apiBaseUrl }) {
       setCurrentStage((prev) => (prev < 4 ? prev + 1 : prev));
     }, 600);
 
-    const cleanedProblem = problem.replace(/\s+/g, ' ').trim();
+    const cleanedProblem = targetProblem.replace(/\s+/g, ' ').trim();
 
     try {
       const response = await fetch(`${apiBaseUrl}/solve`, {
@@ -116,6 +117,7 @@ export default function StudentView({ apiBaseUrl }) {
         <>
           {/* Input */}
           <ProblemInput
+            apiBaseUrl={apiBaseUrl}
             problem={problem}
             setProblem={setProblem}
             onSubmit={handleSubmit}
