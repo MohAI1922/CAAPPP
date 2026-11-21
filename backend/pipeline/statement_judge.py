@@ -80,6 +80,7 @@ class JudgeResult:
     back_translation: str           # Human-readable restatement of the Lean statement
     similarity_score: float         # 0.0 – 1.0 (fuzzy match score)
     reason: Optional[str] = None    # Explanation of mismatch (if any)
+    ast_checks: Optional[list[str]] = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -151,6 +152,7 @@ def judge(
             verdict="MATCH",
             back_translation=back_translation,
             similarity_score=similarity,
+            ast_checks=ast_check.checks_run,
         )
     else:
         reason_parts = []

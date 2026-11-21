@@ -1711,6 +1711,8 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
                     template_id=template_id,
                     elapsed_ms=elapsed_ms,
                     from_cache=False,
+                    ast_verified=True,
+                    ast_checks=judge_result.ast_checks,
                 )
 
             else:

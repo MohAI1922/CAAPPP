@@ -353,7 +353,20 @@ def verify_ast_faithfulness(
             except Exception:
                 pass
 
-    # ── 5. Function Presence Guard Directly Against Lean AST ──────────────────
+    # ── 5b. Discrete Literal Preservation Guard (Prime, GCD, LCM, Comb) ─────
+    if any(tok in prop_str for tok in ("Nat.Prime", "Nat.gcd", "Nat.lcm", "Nat.choose", "Nat.factorial", "Nat.descFactorial", "∣")):
+        checks.append("literal_preservation_guard")
+        p_ints = set(re.findall(r"\b\d+\b", p))
+        l_ints = set(re.findall(r"\b\d+\b", lean_clean))
+        if p_ints and not (p_ints & l_ints):
+            return ASTFaithfulnessResult(
+                passed=False,
+                checks_run=checks,
+                reason="AST Anti-Cheating Rejection: Lean discrete theorem does not reference the integers from the problem.",
+                lean_proposition=prop_str,
+            )
+
+    # ── 6. Function Presence Guard Directly Against Lean AST ──────────────────
     checks.append("transcendental_function_guard")
     prop_low = prop_str.lower()
     for fn in ("sin", "cos", "tan", "exp", "log"):

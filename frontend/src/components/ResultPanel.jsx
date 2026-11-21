@@ -306,7 +306,14 @@ export default function ResultPanel({ result }) {
                 Lean 4 Verified
               </span>
               {result.ast_verified !== false && (
-                <span className="text-xs font-semibold px-2 py-0.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 rounded-full font-mono">
+                <span
+                  title={
+                    Array.isArray(result.ast_checks) && result.ast_checks.length > 0
+                      ? `AST Guards Passed: ${result.ast_checks.join(', ')}`
+                      : 'Structural AST Faithfulness Verified'
+                  }
+                  className="text-xs font-semibold px-2 py-0.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 rounded-full font-mono cursor-help"
+                >
                   AST Faithfulness Verified
                 </span>
               )}

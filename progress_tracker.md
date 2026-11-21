@@ -609,8 +609,8 @@ timeline
 - **Contribution #2 — Structural AST Anti-Cheating Verifier (`backend/pipeline/ast_faithfulness.py`, `backend/pipeline/statement_judge.py`, `backend/main.py`, `frontend/src/components/ResultPanel.jsx`)**:
   - Implemented `verify_ast_faithfulness()` parsing both user problem expressions and Lean 4 theorem signatures into canonical SymPy trees to block trivial tautology substitution (`1 + 1 = 2`, `x = x`), strict inequality weakening (`>` → `≥` or `=`), RHS tampering (`(a+b)^2 = a^2 + b^2` altered to `a^2 + 2ab + b^2`), derivative target erasure, and dropped transcendental functions.
   - Integrated directly into both `statement_judge.judge()` and the generalized pipeline; surfaced `ast_verified` badge (`AST Faithfulness Verified`) in `ResultPanel.jsx`.
-- **SymPy Dev-Mode Parity & UI Build (`backend/pipeline/lean_runner.py`)**:
-  - Added general `≠` counterexample disproof evaluation and fixed `¬ Nat.Prime` / unparenthesized `¬ P` negation handling in `_verify_with_sympy`; rebuilt frontend (`npm --prefix frontend run build`).
+- **SymPy Dev-Mode Parity, Combinatorics Claims & UI Build (`backend/pipeline/generalized_prover.py`, `backend/pipeline/lean_runner.py`, `frontend/`)**:
+  - Updated `# 10` discrete handlers (`mod`, `gcd`, `lcm`, `factorial`, `choose`, `perm`) in `generalized_prover.py` to honor user-claimed RHS values (`Prove that 5! = 100`, `Prove that gcd(12, 18) = 4`), synthesized `Nat.factorial`/`Nat.gcd`/`Nat.choose` counterexample disproofs, refined multi-variable trig addition counterexample tactics (`Real.sin_add`/`cos_add`), added `Nat.* ≠` and `¬ P` parity to `_verify_with_sympy`, added `literal_preservation_guard` in `ast_faithfulness.py`, forwarded `ast_checks` into `SolveResponse` & `ResultPanel.jsx` tooltip, and rebuilt the frontend (`npm --prefix frontend run build`).
 - **Verification**:
-  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true proofs verified + **8/8** false claims refuted with **Lean-verified counterexamples** (`336.238s — OK`).
-  - Full SymPy dev-mode regression suite: **268 / 268 passing (100.0%)** in `14.640s`.
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true proofs verified + **11/11** false claims refuted with **Lean-verified counterexamples** (`399.677s — OK`).
+  - Full SymPy dev-mode regression suite: **268 / 268 passing (100.0%)** in `15.339s`.

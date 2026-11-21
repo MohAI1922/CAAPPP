@@ -65,6 +65,7 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
                 self.assertEqual(data["status"], "VERIFIED", f"Expected VERIFIED for '{prob}', got {data}")
                 self.assertTrue(data["generalized_mode"])
                 self.assertTrue(data.get("ast_verified", False))
+                self.assertTrue(data.get("ast_checks"))
                 self.assertEqual(data["template_id"], expected_kind)
                 self.assertTrue(data["explanation"])
                 self.assertTrue(data["mental_model"])
@@ -76,10 +77,13 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             "Prove that 2^10 < 1000",
             "Prove that 7 divides 100",
             "Prove that sin(x)^2 + cos(x)^2 = 2",
+            "Prove that sin(x + y) = sin(x) + sin(y)",
             "Prove that x^2 + y^2 < 2*x*y",
             "Prove that (3 + 4i) * (1 - 2i) = 11 + 2i",
             "Prove that log(a + b) = log(a) + log(b)",
             "Prove that 91 is prime",
+            "Prove that 5! = 100",
+            "Prove that gcd(12, 18) = 4",
         ]
         with TestClient(app) as client:
             for claim in false_claims:

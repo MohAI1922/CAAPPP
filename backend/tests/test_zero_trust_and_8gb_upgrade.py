@@ -186,7 +186,14 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
         )
         self.assertFalse(res_tamper.passed)
 
-        # 5. Legitimate faithful identity passes
+        # 5. Discrete literal substitution (`Nat.Prime 7` submitted for `Prove that 91 is prime`)
+        res_swap_lit = verify_ast_faithfulness(
+            "Prove that 91 is prime",
+            "example : Nat.Prime 7 := by decide",
+        )
+        self.assertFalse(res_swap_lit.passed)
+
+        # 6. Legitimate faithful identity passes
         res_ok = verify_ast_faithfulness(
             "Prove that (a + b)^2 = a^2 + 2*a*b + b^2",
             "example (a b : ℝ) : (a + b)^2 = a^2 + 2*a*b + b^2 := by ring",

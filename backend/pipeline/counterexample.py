@@ -144,7 +144,54 @@ def synthesize_counterexample_proposal(
                 ),
             )
 
-    # 3. False Complex Arithmetic Identity: e.g. "Prove that (3 + 4i) * (1 - 2i) = 11 + 2i"
+    # 3. False Combinatorics / Number-Theory Claim (factorial, gcd, lcm, choose, perm, mod)
+    m_cl_eq = re.search(r"=\s*(\d+)\s*[?.!]*$", p_l)
+    if m_cl_eq:
+        claimed_i = int(m_cl_eq.group(1))
+        m_fact = re.search(r"(?:\bfactorial\s+(?:of\s+)?(\d+)|(\d+)\s*!)", p_l)
+        if m_fact:
+            n_i = int(m_fact.group(1) or m_fact.group(2))
+            actual = math.factorial(n_i)
+            if actual != claimed_i:
+                return CounterexampleResult(
+                    found=True,
+                    witness={"n": str(n_i)},
+                    witness_display=f"{n_i}! = {actual}",
+                    lhs_value=str(actual),
+                    rhs_value=str(claimed_i),
+                    disproof_lean_statement=f"example : Nat.factorial {n_i} ≠ {claimed_i} := by decide",
+                    explanation=f"Evaluating {n_i}! gives {actual}, not {claimed_i} ({actual} ≠ {claimed_i}).",
+                )
+        m_gcd = re.search(r"\bgcd\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p_l)
+        if m_gcd:
+            a_i, b_i = int(m_gcd.group(1)), int(m_gcd.group(2))
+            actual = math.gcd(a_i, b_i)
+            if actual != claimed_i:
+                return CounterexampleResult(
+                    found=True,
+                    witness={"a": str(a_i), "b": str(b_i)},
+                    witness_display=f"gcd({a_i}, {b_i}) = {actual}",
+                    lhs_value=str(actual),
+                    rhs_value=str(claimed_i),
+                    disproof_lean_statement=f"example : Nat.gcd {a_i} {b_i} ≠ {claimed_i} := by decide",
+                    explanation=f"The greatest common divisor of {a_i} and {b_i} is {actual}, not {claimed_i} ({actual} ≠ {claimed_i}).",
+                )
+        m_ch = re.search(r"(?:choose|C)\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p, re.I)
+        if m_ch:
+            n_i, k_i = int(m_ch.group(1)), int(m_ch.group(2))
+            actual = math.comb(n_i, k_i)
+            if actual != claimed_i:
+                return CounterexampleResult(
+                    found=True,
+                    witness={"n": str(n_i), "k": str(k_i)},
+                    witness_display=f"C({n_i}, {k_i}) = {actual}",
+                    lhs_value=str(actual),
+                    rhs_value=str(claimed_i),
+                    disproof_lean_statement=f"example : Nat.choose {n_i} {k_i} ≠ {claimed_i} := by decide",
+                    explanation=f"Evaluating C({n_i}, {k_i}) gives {actual}, not {claimed_i} ({actual} ≠ {claimed_i}).",
+                )
+
+    # 3b. False Complex Arithmetic Identity: e.g. "Prove that (3 + 4i) * (1 - 2i) = 11 + 2i"
     if (
         "=" in p and ("complex" in p_l or re.search(r"(?:\d\s*\*?\s*i\b|[+-]\s*i\b)", p_l))
         and not any(w in p_l for w in ("derivative", "integral", "matrix", "determinant"))
@@ -339,7 +386,12 @@ def synthesize_counterexample_proposal(
                                 f"  try norm_num at he"
                             )
                         elif has_trig:
-                            disproof = f"example : ({lean_l}) ≠ ({lean_r}) := by simp"
+                            disproof = (
+                                f"example : ({lean_l}) ≠ ({lean_r}) := by\n"
+                                f"  simp [Real.sin_add, Real.cos_add, Real.sin_two_mul, Real.cos_two_mul, "
+                                f"Real.sin_pi, Real.cos_pi, Real.sin_pi_div_two, Real.cos_pi_div_two]\n"
+                                f"  try norm_num"
+                            )
                         else:
                             disproof = f"example : ({lean_l}) ≠ ({lean_r}) := by norm_num"
 

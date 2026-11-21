@@ -903,6 +903,24 @@ def _verify_with_sympy(lean_statement: str) -> bool:
         if m_neq:
             l_s = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", m_neq.group(1)).strip()
             r_s = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", m_neq.group(2)).strip()
+            import math as _m
+            if l_s.startswith("Nat.") and re.fullmatch(r"\d+", r_s):
+                r_int = int(r_s)
+                m_f = re.match(r"^Nat\.factorial\s+(\d+)$", l_s)
+                if m_f:
+                    return _m.factorial(int(m_f.group(1))) != r_int
+                m_g = re.match(r"^Nat\.gcd\s+(\d+)\s+(\d+)$", l_s)
+                if m_g:
+                    return _m.gcd(int(m_g.group(1)), int(m_g.group(2))) != r_int
+                m_lc = re.match(r"^Nat\.lcm\s+(\d+)\s+(\d+)$", l_s)
+                if m_lc:
+                    return _m.lcm(int(m_lc.group(1)), int(m_lc.group(2))) != r_int
+                m_ch = re.match(r"^Nat\.choose\s+(\d+)\s+(\d+)$", l_s)
+                if m_ch:
+                    return _m.comb(int(m_ch.group(1)), int(m_ch.group(2))) != r_int
+                m_pm = re.match(r"^Nat\.descFactorial\s+(\d+)\s+(\d+)$", l_s)
+                if m_pm:
+                    return _m.perm(int(m_pm.group(1)), int(m_pm.group(2))) != r_int
             neq_locals = {
                 "sympy": sympy,
                 "sqrt": sympy.sqrt,

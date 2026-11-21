@@ -401,29 +401,36 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 reasoning=f"{b_i} divided by {a_i} leaves remainder {b_i % a_i} ≠ 0, so {a_i} does not divide {b_i}.",
             )
 
+    def _extract_claimed_nat(prompt_txt: str) -> Optional[int]:
+        m_cl = re.search(r"=\s*(\d+)\s*[?.!]*$", prompt_txt)
+        return int(m_cl.group(1)) if m_cl else None
+
     # 10. Modular arithmetic / GCD / LCM / Factorial / Binomial / Finite Sum
     m_mod = re.search(r"(\d+)\s*(?:mod|modulo|%)\s*(\d+)", p_l)
     if m_mod:
         a_i, m_i = int(m_mod.group(1)), int(m_mod.group(2))
         if m_i > 0:
-            rem = a_i % m_i
+            claimed = _extract_claimed_nat(p_l)
+            target = claimed if claimed is not None else (a_i % m_i)
             return GeneralizedProposal(
                 subkind="generalized_number_theory",
-                candidate_answer=str(rem),
-                lean_statement=f"example : ({a_i} : ℕ) % {m_i} = {rem} := by norm_num",
-                back_translation=f"Compute {a_i} mod {m_i}. The remainder is {rem}.",
-                reasoning=f"Dividing {a_i} by {m_i} leaves remainder {rem}.",
+                candidate_answer=str(target),
+                lean_statement=f"example : ({a_i} : ℕ) % {m_i} = {target} := by norm_num",
+                back_translation=f"Compute {a_i} mod {m_i}. Claimed remainder is {target}.",
+                reasoning=f"Dividing {a_i} by {m_i} leaves remainder {a_i % m_i}.",
             )
 
     m_gcd = re.search(r"\bgcd\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p_l)
     if m_gcd:
         a_i, b_i = int(m_gcd.group(1)), int(m_gcd.group(2))
         g = math.gcd(a_i, b_i)
+        claimed = _extract_claimed_nat(p_l)
+        target = claimed if claimed is not None else g
         return GeneralizedProposal(
             subkind="generalized_number_theory",
-            candidate_answer=str(g),
-            lean_statement=f"example : Nat.gcd {a_i} {b_i} = {g} := by decide",
-            back_translation=f"Find gcd({a_i}, {b_i}). The answer is {g}.",
+            candidate_answer=str(target),
+            lean_statement=f"example : Nat.gcd {a_i} {b_i} = {target} := by decide",
+            back_translation=f"Find gcd({a_i}, {b_i}). Claimed answer is {target}.",
             reasoning=f"Using Euclidean division, the greatest common divisor of {a_i} and {b_i} is {g}.",
         )
 
@@ -431,11 +438,13 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
     if m_lcm:
         a_i, b_i = int(m_lcm.group(1)), int(m_lcm.group(2))
         l_val = math.lcm(a_i, b_i)
+        claimed = _extract_claimed_nat(p_l)
+        target = claimed if claimed is not None else l_val
         return GeneralizedProposal(
             subkind="generalized_number_theory",
-            candidate_answer=str(l_val),
-            lean_statement=f"example : Nat.lcm {a_i} {b_i} = {l_val} := by decide",
-            back_translation=f"Find lcm({a_i}, {b_i}). The answer is {l_val}.",
+            candidate_answer=str(target),
+            lean_statement=f"example : Nat.lcm {a_i} {b_i} = {target} := by decide",
+            back_translation=f"Find lcm({a_i}, {b_i}). Claimed answer is {target}.",
             reasoning=f"Using lcm(a, b) = (a * b) / gcd(a, b), lcm({a_i}, {b_i}) = {l_val}.",
         )
 
@@ -444,11 +453,13 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
         n_i = int(m_fact.group(1) or m_fact.group(2))
         if 0 <= n_i <= 12:
             val = math.factorial(n_i)
+            claimed = _extract_claimed_nat(p_l)
+            target = claimed if claimed is not None else val
             return GeneralizedProposal(
                 subkind="generalized_series_combinatorics",
-                candidate_answer=str(val),
-                lean_statement=f"example : Nat.factorial {n_i} = {val} := by decide",
-                back_translation=f"Compute {n_i}!. The factorial is {val}.",
+                candidate_answer=str(target),
+                lean_statement=f"example : Nat.factorial {n_i} = {target} := by decide",
+                back_translation=f"Compute {n_i}!. Claimed factorial is {target}.",
                 reasoning=f"Multiplying integers from 1 up to {n_i} gives {val}.",
             )
 
@@ -457,11 +468,13 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
         n_i, k_i = int(m_choose.group(1)), int(m_choose.group(2))
         if n_i <= 20 and k_i <= n_i:
             val = math.comb(n_i, k_i)
+            claimed = _extract_claimed_nat(p_l)
+            target = claimed if claimed is not None else val
             return GeneralizedProposal(
                 subkind="generalized_series_combinatorics",
-                candidate_answer=str(val),
-                lean_statement=f"example : Nat.choose {n_i} {k_i} = {val} := by decide",
-                back_translation=f"Compute choose({n_i}, {k_i}). The value is {val}.",
+                candidate_answer=str(target),
+                lean_statement=f"example : Nat.choose {n_i} {k_i} = {target} := by decide",
+                back_translation=f"Compute choose({n_i}, {k_i}). Claimed value is {target}.",
                 reasoning=f"C({n_i}, {k_i}) = {n_i}! / ({k_i}! * ({n_i}-{k_i})!) = {val}.",
             )
 
@@ -470,11 +483,13 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
         n_i, k_i = int(m_perm.group(1)), int(m_perm.group(2))
         if n_i <= 20 and k_i <= n_i:
             val = math.perm(n_i, k_i)
+            claimed = _extract_claimed_nat(p_l)
+            target = claimed if claimed is not None else val
             return GeneralizedProposal(
                 subkind="generalized_series_combinatorics",
-                candidate_answer=str(val),
-                lean_statement=f"example : Nat.descFactorial {n_i} {k_i} = {val} := by decide",
-                back_translation=f"Find permutations P({n_i}, {k_i}). The value is {val}.",
+                candidate_answer=str(target),
+                lean_statement=f"example : Nat.descFactorial {n_i} {k_i} = {target} := by decide",
+                back_translation=f"Find permutations P({n_i}, {k_i}). Claimed value is {target}.",
                 reasoning=f"P({n_i}, {k_i}) = {n_i}! / ({n_i} - {k_i})! = {val}.",
             )
 
