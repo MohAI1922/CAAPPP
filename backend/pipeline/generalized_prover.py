@@ -80,7 +80,7 @@ def _looks_like_math(problem: str) -> bool:
     math_words = (
         "prove", "verify", "show that", "does ", "divide", "divisible",
         "mod", "modulo", "remainder", "gcd", "lcm", "factorial", "choose",
-        "binomial", "sum of", "partial derivative", "gradient", "determinant", "matrix",
+        "binomial", "sum of", "partial derivative", "gradient", "determinant", "matrix", "matrices", "permutation",
         "dot product", "cross product", "magnitude", "norm of", "system",
         "complex", "imaginary", "logarithm", "exponential",
         "inequality", "identity", "polynomial", "factor",
@@ -465,6 +465,32 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 reasoning=f"C({n_i}, {k_i}) = {n_i}! / ({k_i}! * ({n_i}-{k_i})!) = {val}.",
             )
 
+    m_perm = re.search(r"(?:\bpermutations?\s*|\bP)\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p)
+    if m_perm:
+        n_i, k_i = int(m_perm.group(1)), int(m_perm.group(2))
+        if n_i <= 20 and k_i <= n_i:
+            val = math.perm(n_i, k_i)
+            return GeneralizedProposal(
+                subkind="generalized_series_combinatorics",
+                candidate_answer=str(val),
+                lean_statement=f"example : Nat.descFactorial {n_i} {k_i} = {val} := by decide",
+                back_translation=f"Find permutations P({n_i}, {k_i}). The value is {val}.",
+                reasoning=f"P({n_i}, {k_i}) = {n_i}! / ({n_i} - {k_i})! = {val}.",
+            )
+
+    m_sum_sq = re.search(r"sum\s+of\s+(?:the\s+)?squares\s+of\s+(?:the\s+)?first\s+(\d+)\s+positive\s+integers", p_l)
+    if m_sum_sq:
+        n_i = int(m_sum_sq.group(1))
+        if 1 <= n_i <= 100:
+            total = n_i * (n_i + 1) * (2 * n_i + 1) // 6
+            return GeneralizedProposal(
+                subkind="generalized_series_combinatorics",
+                candidate_answer=str(total),
+                lean_statement=f"example : (∑ k ∈ Finset.Icc 1 {n_i}, k ^ 2) = {total} := by decide",
+                back_translation=f"Find the sum of squares of the first {n_i} positive integers. The sum is {total}.",
+                reasoning=f"Using n(n+1)(2n+1)/6 for n = {n_i} gives {total}.",
+            )
+
     m_sum = re.search(r"sum\s+of\s+(?:the\s+)?first\s+(\d+)\s+positive\s+integers", p_l)
     if m_sum:
         n_i = int(m_sum.group(1))
@@ -590,30 +616,114 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             except Exception:
                 pass
 
-    # 10d. Exponential Equations: e.g. "Solve 2^x = 32"
-    m_exp_eq = re.search(r"\b(\d+)\s*\^\s*\(?([a-zA-Z])\)?\s*=\s*(\d+)\b", p)
+    # 10d. Exponential Equations: e.g. "Solve 2^x = 32", "Solve 2^x = 1/8", "Solve 4^x = 8"
+    m_exp_eq = re.search(r"\b(\d+)\s*\^\s*\(?([a-zA-Z])\)?\s*=\s*(\d+(?:\s*/\s*\d+)?)\b", p)
     if m_exp_eq and not any(op in p for op in ("<", ">", "≤", "≥")):
         base_i = int(m_exp_eq.group(1))
         var_name = m_exp_eq.group(2)
-        rhs_i = int(m_exp_eq.group(3))
-        if base_i > 1 and rhs_i > 0:
-            exp_val = round(math.log(rhs_i, base_i))
-            if base_i ** exp_val == rhs_i:
+        rhs_str = m_exp_eq.group(3).replace(" ", "")
+        rhs_rat = sp.Rational(rhs_str)
+        if base_i > 1 and rhs_rat > 0:
+            exp_exact = sp.simplify(sp.log(rhs_rat, base_i))
+            rhs_lean = rhs_str if "/" not in rhs_str else f"({rhs_str} : ℝ)"
+            if getattr(exp_exact, "is_Integer", False):
+                k_val = int(exp_exact)
+                k_lean = str(k_val) if k_val >= 0 else f"({k_val} : ℝ)"
                 lean_stmt = (
-                    f"example ({var_name} : ℝ) : (({base_i} : ℝ) ^ {var_name} = {rhs_i}) ↔ ({var_name} = {exp_val}) := by\n"
+                    f"example ({var_name} : ℝ) : (({base_i} : ℝ) ^ {var_name} = {rhs_lean}) ↔ ({var_name} = {k_lean}) := by\n"
                     f"  constructor\n"
                     f"  · intro h\n"
-                    f"    have h1 : ({base_i} : ℝ) ^ {var_name} = ({base_i} : ℝ) ^ ({exp_val} : ℝ) := by norm_num; exact h\n"
+                    f"    have h1 : ({base_i} : ℝ) ^ {var_name} = ({base_i} : ℝ) ^ ({k_val} : ℝ) := by norm_num; exact h\n"
                     f"    exact (Real.rpow_right_inj (by norm_num) (by norm_num)).mp h1\n"
                     f"  · intro h; subst h; norm_num"
                 )
                 return GeneralizedProposal(
                     subkind="generalized_exponential_equation",
-                    candidate_answer=f"{var_name} = {exp_val}",
+                    candidate_answer=f"{var_name} = {k_val}",
                     lean_statement=lean_stmt,
-                    back_translation=f"Solve {base_i}^{var_name} = {rhs_i} for real {var_name}. The unique solution is {var_name} = {exp_val}.",
-                    reasoning=f"Rewriting {rhs_i} as {base_i}^{exp_val} matches bases on both sides, yielding {var_name} = {exp_val}.",
+                    back_translation=f"Solve {base_i}^{var_name} = {rhs_str} for real {var_name}. The unique solution is {var_name} = {k_val}.",
+                    reasoning=f"Rewriting {rhs_str} as {base_i}^{k_val} matches bases on both sides, yielding {var_name} = {k_val}.",
                 )
+            elif getattr(exp_exact, "is_Rational", False):
+                # Common base cb^p = base_i, cb^q = rhs_rat
+                cb = None
+                p_exp = q_exp = 0
+                for cand in range(2, base_i + 1):
+                    lp = sp.simplify(sp.log(base_i, cand))
+                    lq = sp.simplify(sp.log(rhs_rat, cand))
+                    if getattr(lp, "is_Integer", False) and getattr(lq, "is_Integer", False):
+                        cb, p_exp, q_exp = cand, int(lp), int(lq)
+                        break
+                if cb is not None and p_exp > 0:
+                    sol_str = f"{q_exp}/{p_exp}" if sp.Rational(q_exp, p_exp).q != 1 else str(sp.Rational(q_exp, p_exp))
+                    sol_lean = f"({sol_str} : ℝ)"
+                    lean_stmt = (
+                        f"example ({var_name} : ℝ) : (({base_i} : ℝ) ^ {var_name} = {rhs_lean}) ↔ ({var_name} = {sol_lean}) := by\n"
+                        f"  constructor\n"
+                        f"  · intro h\n"
+                        f"    have h1 : ({cb} : ℝ) ^ (({p_exp} : ℝ) * {var_name}) = ({cb} : ℝ) ^ ({q_exp} : ℝ) := by\n"
+                        f"      calc ({cb} : ℝ) ^ (({p_exp} : ℝ) * {var_name})\n"
+                        f"          = (({cb} : ℝ) ^ ({p_exp} : ℝ)) ^ {var_name} := by rw [Real.rpow_mul (by norm_num)]\n"
+                        f"        _ = ({base_i} : ℝ) ^ {var_name} := by norm_num\n"
+                        f"        _ = {rhs_lean} := h\n"
+                        f"        _ = ({cb} : ℝ) ^ ({q_exp} : ℝ) := by norm_num\n"
+                        f"    have h2 : ({p_exp} : ℝ) * {var_name} = ({q_exp} : ℝ) := (Real.rpow_right_inj (by norm_num) (by norm_num)).mp h1\n"
+                        f"    linarith\n"
+                        f"  · intro h; subst h; norm_num"
+                    )
+                    return GeneralizedProposal(
+                        subkind="generalized_exponential_equation",
+                        candidate_answer=f"{var_name} = {sol_str}",
+                        lean_statement=lean_stmt,
+                        back_translation=f"Solve {base_i}^{var_name} = {rhs_str} for real {var_name}. The unique solution is {var_name} = {sol_str}.",
+                        reasoning=f"Expressing both {base_i} = {cb}^{p_exp} and {rhs_str} = {cb}^{q_exp} equates {p_exp}*{var_name} = {q_exp}, giving {var_name} = {sol_str}.",
+                    )
+
+    # 10e. 2x2 Matrix Multiplication: "Multiply matrices [[a, b], [c, d]] and [[e, f], [g, h]]"
+    if "matrix" in p_l or "matrices" in p_l:
+        m_mm = re.search(
+            r"\[\s*\[\s*([^\],]+)\s*,\s*([^\]]+)\s*\]\s*,\s*\[\s*([^\],]+)\s*,\s*([^\]]+)\s*\]\s*\]"
+            r".*?"
+            r"\[\s*\[\s*([^\],]+)\s*,\s*([^\]]+)\s*\]\s*,\s*\[\s*([^\],]+)\s*,\s*([^\]]+)\s*\]\s*\]",
+            p,
+        )
+        if m_mm and ("multiply" in p_l or "product" in p_l or "*" in p or "times" in p_l):
+            try:
+                vals = [sp.Rational(x.strip()) for x in m_mm.groups()]
+                a, b, c, d, e, f, g, h = vals
+                c11, c12 = a * e + b * g, a * f + b * h
+                c21, c22 = c * e + d * g, c * f + d * h
+                fa, fb, fc, fd, fe, ff, fg, fh = [_fmt_rational(v) for v in vals]
+                r11, r12, r21, r22 = [_fmt_rational(v) for v in (c11, c12, c21, c22)]
+                lean_stmt = (
+                    f"example : (({fa} : ℝ)*({fe}) + ({fb})*({fg}) = ({r11})) ∧ "
+                    f"(({fa} : ℝ)*({ff}) + ({fb})*({fh}) = ({r12})) ∧ "
+                    f"(({fc} : ℝ)*({fe}) + ({fd})*({fg}) = ({r21})) ∧ "
+                    f"(({fc} : ℝ)*({ff}) + ({fd})*({fh}) = ({r22})) := by norm_num"
+                )
+                ans_mat = f"[[{r11}, {r12}], [{r21}, {r22}]]"
+                return GeneralizedProposal(
+                    subkind="generalized_linear_algebra",
+                    candidate_answer=ans_mat,
+                    lean_statement=lean_stmt,
+                    back_translation=f"Multiply 2x2 matrices [[{fa}, {fb}], [{fc}, {fd}]] and [[{fe}, {ff}], [{fg}, {fh}]]. Result: {ans_mat}.",
+                    reasoning=f"Computing row-by-column dot products gives entries [{r11}, {r12}] and [{r21}, {r22}].",
+                )
+            except Exception:
+                pass
+
+    # 10f. Primality Claims: "Prove that N is prime" (accepts primes, strictly rejects composites!)
+    m_prime_claim = re.search(r"(?:prove|show|verify)\s+(?:that\s+)?(\d+)\s+is\s+(?:a\s+)?prime\b", p_l)
+    if m_prime_claim:
+        n_i = int(m_prime_claim.group(1))
+        if 2 <= n_i <= 10000:
+            return GeneralizedProposal(
+                subkind="generalized_number_theory",
+                candidate_answer=f"{n_i} is prime",
+                lean_statement=f"example : Nat.Prime {n_i} := by decide",
+                back_translation=f"Verify whether {n_i} is a prime number.",
+                reasoning=f"Testing whether {n_i} has only divisors 1 and {n_i}.",
+            )
 
     # 11. Numeric & Symbolic Inequalities (both true and false claims!)
     m_ineq = re.search(

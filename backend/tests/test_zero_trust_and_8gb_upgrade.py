@@ -147,6 +147,23 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
             self.assertTrue(data["mental_model"])
             self.assertTrue(data["pitfall_tip"])
 
+    def test_all_concept_guides_comply_with_rule_22_and_23(self):
+        from backend.pipeline.explainer import _CONCEPT_GUIDES
+        forbidden_tokens = (
+            "el-moasser",
+            "book of integrals",
+            "senior 3",
+            "miguel santiago",
+            "real.",
+            "complex.i",
+            "lean 4",
+            "mathlib",
+        )
+        for key, guide in _CONCEPT_GUIDES.items():
+            blob = " ".join(guide.values()).lower()
+            for tok in forbidden_tokens:
+                self.assertNotIn(tok, blob, f"Rule 22/23 violation '{tok}' in guide '{key}'")
+
 
 if __name__ == "__main__":
     unittest.main()

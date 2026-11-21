@@ -73,6 +73,13 @@ GENERALIZED_PROMPTS = [
     "Prove that log(a / b) = log(a) - log(b)",
     "Solve 2^x = 32",
     "Solve 3^x = 81",
+    "Solve 2^x = 1/8",
+    "Solve 4^x = 8",
+    # Permutations, Sum of Squares, Matrix Product & Primality
+    "Find P(6, 2)",
+    "Find the sum of squares of the first 5 positive integers",
+    "Multiply matrices [[1, 2], [3, 4]] and [[5, 6], [7, 8]]",
+    "Prove that 97 is prime",
 ]
 
 NON_MATH_PROMPTS = [

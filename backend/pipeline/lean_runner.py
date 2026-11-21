@@ -913,13 +913,37 @@ def _verify_with_sympy(lean_statement: str) -> bool:
 
         # ── Linear / Exponential equation solving: (lhs = rhs) ↔ (var = ans) ──
         eq_clean_iff = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", eq_part).strip()
-        m = re.search(r"\((.+?)\s*=\s*(.+?)\)\s*↔\s*\(([a-zA-Z])\s*=\s*(.+?)\)", eq_clean_iff)
-        if m:
-            lhs = sympify(_py_expr(m.group(1)))
-            rhs = sympify(_py_expr(m.group(2)))
-            v_sym = symbols(m.group(3))
-            ans = sympify(_py_expr(m.group(4)))
-            return bool(sympy.simplify(lhs.subs(v_sym, ans) - rhs) == 0)
+        if "↔" in eq_clean_iff and "=" in eq_clean_iff:
+            iff_left, iff_right = [s.strip() for s in eq_clean_iff.split("↔", 1)]
+            def _strip_outer(s: str) -> str:
+                while s.startswith("(") and s.endswith(")"):
+                    depth = 0
+                    balanced = True
+                    for idx_c, ch_c in enumerate(s):
+                        if ch_c == "(":
+                            depth += 1
+                        elif ch_c == ")":
+                            depth -= 1
+                            if depth == 0 and idx_c < len(s) - 1:
+                                balanced = False
+                                break
+                    if balanced and depth == 0:
+                        s = s[1:-1].strip()
+                    else:
+                        break
+                return s
+            iff_l = _strip_outer(iff_left)
+            iff_r = _strip_outer(iff_right)
+            if "=" in iff_l and "=" in iff_r:
+                lhs_str, rhs_str = iff_l.split("=", 1)
+                var_part, ans_str = iff_r.split("=", 1)
+                var_tok = var_part.strip()
+                if re.fullmatch(r"[a-zA-Z]", var_tok):
+                    lhs = sympify(_py_expr(lhs_str))
+                    rhs = sympify(_py_expr(rhs_str))
+                    v_sym = symbols(var_tok)
+                    ans = sympify(_py_expr(ans_str))
+                    return bool(sympy.simplify(lhs.subs(v_sym, ans) - rhs) == 0)
 
         # ── Conjunction of equalities (A = B ∧ C = D ∧ ...) ──────────────────
         if "∧" in eq_part:
@@ -993,15 +1017,20 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             import math
             return math.factorial(int(m_fact.group(1))) == int(m_fact.group(2))
 
+        m_perm = re.match(r"^Nat\.descFactorial\s+(\d+)\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_perm:
+            import math
+            return math.perm(int(m_perm.group(1)), int(m_perm.group(2))) == int(m_perm.group(3))
+
         m_lcm = re.match(r"^Nat\.lcm\s+(\d+)\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
         if m_lcm:
             import math
             return math.lcm(int(m_lcm.group(1)), int(m_lcm.group(2))) == int(m_lcm.group(3))
 
-        m_fsum = re.match(r"^\(?\s*∑\s+k\s+∈\s+Finset\.Icc\s+(\d+)\s+(\d+),\s*k\s*\)?\s*=\s*(\d+)$", eq_part.strip())
+        m_fsum = re.match(r"^\(?\s*∑\s+k\s+∈\s+Finset\.Icc\s+(\d+)\s+(\d+),\s*(k(?:\s*\^\s*2)?)\s*\)?\s*=\s*(\d+)$", eq_part.strip())
         if m_fsum:
-            lo, hi, tot = int(m_fsum.group(1)), int(m_fsum.group(2)), int(m_fsum.group(3))
-            return sum(range(lo, hi + 1)) == tot
+            lo, hi, body_k, tot = int(m_fsum.group(1)), int(m_fsum.group(2)), m_fsum.group(3), int(m_fsum.group(4))
+            return sum((k_i ** 2 if "^" in body_k else k_i) for k_i in range(lo, hi + 1)) == tot
 
         # ── Generalized Inequalities (<, >, ≤, ≥) ─────────────────────────────
         m_ineq = re.match(r"^(.+?)\s*(<=|>=|≤|≥|<|>)\s*(.+)$", eq_part.strip())

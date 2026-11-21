@@ -399,6 +399,7 @@ def _clean_student_text(text: str) -> str:
         return ""
     res = text
     # Rule 22: clean Lean namespaces
+    res = res.replace("Complex.I", "i")
     res = re.sub(r"\bReal\.([a-zA-Z]+)\s+([a-zA-Z0-9]+)\b", r"\1(\2)", res)
     res = re.sub(r"\bReal\.([a-zA-Z]+)\b", r"\1", res)
     # Remove any accidental Lean / proof-assistant jargon

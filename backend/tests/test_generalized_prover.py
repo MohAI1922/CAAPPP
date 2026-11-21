@@ -50,6 +50,12 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             ("Prove that log(a * b) = log(a) + log(b)", "generalized_log_identity"),
             ("Prove that log(a / b) = log(a) - log(b)", "generalized_log_identity"),
             ("Solve 2^x = 32", "generalized_exponential_equation"),
+            ("Solve 2^x = 1/8", "generalized_exponential_equation"),
+            ("Solve 4^x = 8", "generalized_exponential_equation"),
+            ("Find P(6, 2)", "generalized_series_combinatorics"),
+            ("Find the sum of squares of the first 5 positive integers", "generalized_series_combinatorics"),
+            ("Multiply matrices [[1, 2], [3, 4]] and [[5, 6], [7, 8]]", "generalized_linear_algebra"),
+            ("Prove that 97 is prime", "generalized_number_theory"),
         ]
         with TestClient(app) as client:
             for prob, expected_kind in cases:
@@ -72,6 +78,7 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             "Prove that x^2 + y^2 < 2*x*y",
             "Prove that (3 + 4i) * (1 - 2i) = 11 + 2i",
             "Prove that log(a + b) = log(a) + log(b)",
+            "Prove that 91 is prime",
         ]
         with TestClient(app) as client:
             for claim in false_claims:

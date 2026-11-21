@@ -7546,11 +7546,15 @@ def classify_problem(problem: str) -> Optional[str]:
         or "cross product" in problem_lower
         or re.search(r"\b(?:magnitude|norm)\s+of\s+(?:the\s+)?vector\b", problem_lower)
         or "system" in problem_lower
+        or "matrix" in problem_lower
+        or "matrices" in problem_lower
+        or "permutation" in problem_lower
+        or re.search(r"\bp\s*\(\s*\d+\s*,\s*\d+\s*\)", problem_lower)
         or "complex" in problem_lower
         or re.search(r"(?:\d\s*\*?\s*i\b|[+-]\s*i\b|\(\s*i\b)", problem_lower)
-        or re.search(r"\b\d+\s*\^\s*\(?[a-z]\)?\s*=\s*\d+\b", problem_lower)
+        or re.search(r"\b\d+\s*\^\s*\(?[a-z]\)?\s*=\s*\d+(?:\s*/\s*\d+)?\b", problem_lower)
         or re.search(r"\bgcd\s*\(|\blcm\s*\(|\bchoose\s*\(|\bfactorial\b|\b\d+\s*!", problem_lower)
-        or re.search(r"\bdoes\s+\d+\s+divide\b|\bdivisible\s+by\b|\bmodulo\b|\bsum\s+of\s+(?:the\s+)?first\s+\d+", problem_lower)
+        or re.search(r"\bdoes\s+\d+\s+divide\b|\bdivisible\s+by\b|\bmodulo\b|\bsum\s+of\s+(?:the\s+)?(?:squares\s+of\s+(?:the\s+)?)?first\s+\d+", problem_lower)
         or re.match(r"^\s*(?:prove|show|verify|check\s+whether|is\s+it\s+true)\s+(?:that\s+)?", problem_lower)
     ):
         return None

@@ -582,3 +582,19 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **23/23** true out-of-domain proofs verified + **7/7** false claims strictly rejected (`246.427s — OK`).
   - Full SymPy dev-mode regression suite: **266 / 266 passing (100.0%)** in `13.781s`.
+
+---
+
+## Phase 22: Rational Exponents, 2×2 Matrix Multiplication, Permutations, Primality Claims & Rule 22/23 Linting (Completed 2026-11-21)
+
+- **Expanded Out-of-Domain Mathematical Domains (`backend/pipeline/generalized_prover.py`, `backend/templates/registry.py`, `backend/pipeline/lean_runner.py`)**:
+  - Upgraded exponential equation proving (`10d`) to handle negative and rational exponents (`2^x = 1/8 → x = -3`, `4^x = 8 → x = 3/2` via common-base `calc` + `Real.rpow_mul` + `Real.rpow_right_inj` + `linarith`) and updated SymPy balanced-parenthesis `↔` parsing.
+  - Added Lean 4 verification for **2×2 matrix multiplication** (`norm_num` entry conjunction), **permutations `P(n, k)`** (`Nat.descFactorial`), **sums of squares** (`∑ k ∈ Finset.Icc 1 n, k ^ 2`), and **primality claims** (`Nat.Prime`, accepting `97` and strictly rejecting composite `91`).
+- **Safety Linting & Frontend Showcase (`backend/pipeline/explainer.py`, `backend/tests/test_zero_trust_and_8gb_upgrade.py`, `frontend/src/components/ProblemInput.jsx`)**:
+  - Sanitized `Complex.I` alongside `Real.*` in `_clean_student_text` and added `test_all_concept_guides_comply_with_rule_22_and_23`.
+  - Added out-of-domain & false-claim showcase examples to `ProblemInput.jsx` and rebuilt production bundle (`134.83 kB` JS, `9.63 kB` CSS).
+- **Dataset (`scripts/enhance_model_dataset.py`, `verimath_finetune_dataset.jsonl`)**:
+  - Added 18 verified pairs (`10,465` total entries, `0` JSON errors, `0` `sorry`).
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true out-of-domain proofs verified + **8/8** false claims strictly rejected (`295.560s — OK`).
+  - Full SymPy dev-mode regression suite: **267 / 267 passing (100.0%)** in `13.962s`.

@@ -11,7 +11,11 @@ const PRESET_EXAMPLES = [
   "Simplify (x + 1)² − x²",
   "What is 47 × 89 + 123?",
   "Is 97 prime?",
-  "Find the distance between the points (1, 2) and (4, 6)"
+  "Find the distance between the points (1, 2) and (4, 6)",
+  "Solve the system: 2x + 3y = 13, x - y = -1",
+  "Compute (3 + 4i) * (1 - 2i)",
+  "Prove that log(a * b) = log(a) + log(b)",
+  "Prove that (a + b)^2 = a^2 + b^2"
 ];
 
 export default function ProblemInput({ problem, setProblem, onSubmit, isLoading }) {
