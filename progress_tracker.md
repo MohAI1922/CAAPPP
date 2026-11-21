@@ -628,3 +628,21 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 suite (`backend.tests.test_zero_trust_and_8gb_upgrade`): **15 / 15 passing** in `22.699s` (proving multi-step `calc` certificates inside Lean 4.36.0).
   - Full SymPy dev-mode regression suite: **269 / 269 passing (100.0%)** in `15.830s`.
+
+---
+
+## Phase 25: Full React UI Polish & End-to-End System Verification (Completed 2026-11-21)
+
+- **Header, Footer & Health Indicator (`frontend/src/App.jsx`, `frontend/src/index.css`)**:
+  - Added live `GET /health` status badge in the navbar (`Lean 4 Kernel Live` vs. `CAS + Formal Mode` with template/cache tooltip) and updated footer branding to reflect `Lean 4.36`, `Mathlib`, `Qwen2.5 & SymPy CAS`, and `Raspberry Pi 4 (8 GB)`.
+  - Added `.no-scrollbar` CSS utility and consistent `#020617` base dark styling in `index.css`.
+- **Responsive Input & Pipeline Stage Feedback (`frontend/src/components/ProblemInput.jsx`, `frontend/src/components/StatusIndicator.jsx`, `frontend/src/components/LeanStatement.jsx`, `frontend/src/components/ResultPanel.jsx`)**:
+  - Added clear-input button, responsive mobile-friendly controls, and color-coded demo presets (In-Domain Calculus, Generalized Out-of-Domain, and False-Claim Disproofs) in `ProblemInput.jsx`.
+  - Replaced whole-card pulsing in `StatusIndicator.jsx` with per-step completion/spinner state (`AST & Faithfulness Judge` label).
+  - Distinguished `Generalized: ...` vs. `Template: ...` badges in `LeanStatement.jsx` and `ResultPanel.jsx`.
+- **Teacher Telemetry Failures View (`frontend/src/pages/DashboardView.jsx`)**:
+  - Rendered the **Intercepted Hallucinations & Disproven False Claims** card (`failures`), added amber `UNSUPPORTED` verdict styling, inline backend offline alert, and cached latency indicators.
+- **Verification**:
+  - Frontend production build (`npm --prefix frontend run build`): exited with code `0`.
+  - Full SymPy dev-mode regression suite: **269 / 269 passing (100.0%)** in `15.125s`.
+  - Live Lean 4.36.0 strict End-to-End smoke check (`/app/`, `/health`, `/solve` complex verified, `/solve` false identity Lean-verified counterexample, `/grade-steps` Lean `calc` certification & `dropped_root_error`, `/dashboard/*`): **E2E_UI_AND_API_SMOKE_OK**.

@@ -645,7 +645,9 @@ export default function ResultPanel({ result }) {
             </div>
 
             <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
-              <span>Template: {result.template_id || 'calculus'}</span>
+              <span>
+                {result.generalized_mode ? `Generalized: ${result.template_id}` : `Template: ${result.template_id || 'calculus'}`}
+              </span>
             </div>
           </div>
 
