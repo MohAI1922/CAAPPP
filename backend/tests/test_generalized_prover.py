@@ -31,9 +31,20 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             ("Prove that 2^10 > 1000", "generalized_inequality"),
             ("Does 7 divide 1001?", "generalized_number_theory"),
             ("Find gcd(84, 126)", "generalized_number_theory"),
+            ("Find lcm(12, 18)", "generalized_number_theory"),
+            ("Find 7!", "generalized_series_combinatorics"),
             ("Find the partial derivative of x^2*y + y^3 with respect to x", "generalized_partial_derivative"),
+            ("Find the gradient of x^2*y + y*z^2", "generalized_gradient"),
             ("Find the determinant of [[3, 4], [2, 5]]", "generalized_linear_algebra"),
+            ("Find the determinant of [[1, 2, 3], [0, 4, 5], [1, 0, 6]]", "generalized_linear_algebra"),
+            ("Find the cross product of (1, 2, 3) and (4, 5, 6)", "generalized_linear_algebra"),
+            ("Find the magnitude of the vector (3, 4, 12)", "generalized_linear_algebra"),
+            ("Solve the system: 2x + 3y = 13, x - y = -1", "generalized_linear_system"),
             ("Find the sum of the first 10 positive integers", "generalized_series_combinatorics"),
+            ("Prove that sin(x)^2 + cos(x)^2 = 1", "generalized_trig_identity"),
+            ("Prove that sin(2*x) = 2*sin(x)*cos(x)", "generalized_trig_identity"),
+            ("Prove that x^2 + y^2 >= 2*x*y", "generalized_symbolic_inequality"),
+            ("Prove that x^2 + 1 > 0", "generalized_symbolic_inequality"),
         ]
         with TestClient(app) as client:
             for prob, expected_kind in cases:
@@ -52,6 +63,8 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             "Prove that (a + b)^2 = a^2 + b^2",
             "Prove that 2^10 < 1000",
             "Prove that 7 divides 100",
+            "Prove that sin(x)^2 + cos(x)^2 = 2",
+            "Prove that x^2 + y^2 < 2*x*y",
         ]
         with TestClient(app) as client:
             for claim in false_claims:

@@ -270,6 +270,38 @@ _CONCEPT_GUIDES: Dict[str, Dict[str, str]] = {
         ),
         "pitfall": "Verify every quantifier, domain condition, and boundary case so a single counterexample cannot invalidate the claim.",
     },
+    "generalized_linear_system": {
+        "title": "Simultaneous Linear Systems — Elimination & Back-Substitution",
+        "mental_model": "Eliminate one variable at a time by scaling and adding equations, then substitute back to find every unknown.",
+        "intuition": (
+            "Each linear equation represents a line (or plane in 3D). Solving the system finds the exact intersection point where every equation holds at the exact same time."
+        ),
+        "pitfall": "Always substitute your solution back into ALL original equations—not just the last one—to catch arithmetic or sign slips.",
+    },
+    "generalized_gradient": {
+        "title": "Multivariable Gradient — Direction of Steepest Ascent",
+        "mental_model": "∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z): collect each variable's partial derivative into one vector.",
+        "intuition": (
+            "On a multidimensional surface, the gradient vector points straight uphill in the direction where the function increases fastest, and its length measures that maximum slope."
+        ),
+        "pitfall": "When computing each component ∂f/∂xᵢ, treat all other variables as frozen constants.",
+    },
+    "generalized_trig_identity": {
+        "title": "Trigonometric Identities — Unit-Circle Structure",
+        "mental_model": "Anchor transformations on sin²(x) + cos²(x) = 1, sin(2x) = 2sin(x)cos(x), and cos(2x) = cos²(x) − sin²(x).",
+        "intuition": (
+            "Trigonometric identities express geometric invariants on the unit circle, so they hold identically for every angle x."
+        ),
+        "pitfall": "Watch sign changes in cos(2x) = cos²x − sin²x = 1 − 2sin²x = 2cos²x − 1 and never drop the factor of 2 in sin(2x).",
+    },
+    "generalized_symbolic_inequality": {
+        "title": "Universal Symbolic Inequalities & Sum-of-Squares",
+        "mental_model": "Rewrite A ≥ B as A − B ≥ 0, then complete the square so every term is a non-negative square (x − y)² ≥ 0.",
+        "intuition": (
+            "Since any real square u² ≥ 0, showing that the difference between two sides is a sum of squares guarantees the inequality holds for all real numbers."
+        ),
+        "pitfall": "Test extreme or negative values (like x = −1, y = 1) mentally to make sure an inequality isn't only true for positive numbers.",
+    },
 }
 
 

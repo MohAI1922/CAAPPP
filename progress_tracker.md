@@ -551,3 +551,16 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`test_generalized_prover.py`): **4/4** test suites passing (`7/7` true out-of-domain proofs verified, `3/3` false claims strictly rejected, in-domain isolation & non-math `UNSUPPORTED` confirmed).
   - Full regression suite: **266 / 266 passing (100.0%)**.
+
+---
+
+## Phase 20: Higher-Math Capability Expansion & Model Dataset Enhancement (Completed 2026-11-21)
+
+- **Expanded Mathematical Domains (`backend/pipeline/generalized_prover.py`, `backend/pipeline/lean_runner.py`, `backend/pipeline/explainer.py`)**:
+  - Added Lean 4 autoformalization & verification for **2×2/3×3 linear systems**, **3×3 matrix determinants**, **3D vector cross products & Euclidean norms**, **multivariable gradients ($\nabla f$)**, **trigonometric identities** (`sin²x + cos²x = 1`, `cos(2x)`, `sin(2x)`), **universal symbolic inequalities** (`nlinarith` + `positivity`), **factorials**, and **LCM**.
+  - Added curriculum-aligned intuitive guides for linear systems, gradients, trig identities, and symbolic sum-of-squares inequalities.
+- **Model Fine-Tuning Dataset Expansion (`scripts/enhance_model_dataset.py`, `verimath_finetune_dataset.jsonl`)**:
+  - Appended **115** verified, `sorry`-free generalized autoformalization & non-math guardrail pairs (`10,426` total entries, `0` JSON errors, `0` `sorry` occurrences).
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`test_generalized_prover.py`): **18/18** true out-of-domain proofs verified + **5/5** false claims strictly rejected (`187.988s — OK`).
+  - Full regression suite: **266 / 266 passing (100.0%)** in `12.826s`.

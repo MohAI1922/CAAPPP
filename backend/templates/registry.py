@@ -7540,8 +7540,13 @@ def classify_problem(problem: str) -> Optional[str]:
     if (
         "partial derivative" in problem_lower
         or "∂" in problem_clean
+        or "gradient" in problem_lower
+        or "∇" in problem_clean
         or "dot product" in problem_lower
-        or re.search(r"\bgcd\s*\(|\blcm\s*\(|\bchoose\s*\(", problem_lower)
+        or "cross product" in problem_lower
+        or re.search(r"\b(?:magnitude|norm)\s+of\s+(?:the\s+)?vector\b", problem_lower)
+        or "system" in problem_lower
+        or re.search(r"\bgcd\s*\(|\blcm\s*\(|\bchoose\s*\(|\bfactorial\b|\b\d+\s*!", problem_lower)
         or re.search(r"\bdoes\s+\d+\s+divide\b|\bdivisible\s+by\b|\bmodulo\b|\bsum\s+of\s+(?:the\s+)?first\s+\d+", problem_lower)
         or re.match(r"^\s*(?:prove|show|verify)\s+(?:that\s+)?", problem_lower)
     ):

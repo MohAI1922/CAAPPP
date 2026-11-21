@@ -12,12 +12,13 @@ Architecture (Zero-Trust Propose → Formalize → Judge → Lean Verify / Rejec
           without `sorry`/`admit`/`axiom`.
        b) Deterministic Generalized Symbolic Autoformalizer handles broad unseen
           mathematical structures outside the fixed templates:
-            - Algebraic / polynomial identities & false-identity stress tests
-            - Inequalities (<, >, <=, >=)
-            - Modular arithmetic, divisibility (a ∣ b), GCD / LCM
-            - Factorials, binomial coefficients, finite sums
-            - Multivariable partial derivatives (∂/∂x, ∂/∂y)
-            - 2x2 matrix determinants & vector dot products
+            - Linear systems (2x2 and 3x3)
+            - 2x2 and 3x3 matrix determinants
+            - Vector dot products, 3D cross products & Euclidean norms
+            - Multivariable partial derivatives & gradients (∇f)
+            - Divisibility (a ∣ b), modulo (a % m), GCD, LCM, factorials, C(n, k), finite sums
+            - Numeric & symbolic inequalities (nlinarith / positivity / norm_num)
+            - Algebraic, polynomial & trigonometric identities
   3. Faithfulness & Zero-Trust Lean 4 Kernel Gate:
        - Rejects any `sorry`/`admit`/`axiom`.
        - Verifies with `verify_async()` (Lean 4.36.0 + Mathlib4).
@@ -27,7 +28,6 @@ Architecture (Zero-Trust Propose → Formalize → Judge → Lean Verify / Rejec
 
 from __future__ import annotations
 
-import json
 import logging
 import math
 import re
@@ -61,10 +61,10 @@ class GeneralizedProposal:
 
 _GENERALIZED_SYSTEM_PROMPT = """\
 You are VeriMath Generalized Autoformalizer. The user's math problem is OUTSIDE the predefined template set.
-Propose a concise candidate answer AND a standalone, valid Lean 4 theorem (using Mathlib tactics like norm_num, ring, omega, linarith, decide, or simp) that formally proves the answer.
+Propose a concise candidate answer AND a standalone, valid Lean 4 theorem (using Mathlib tactics like norm_num, ring, omega, linarith, nlinarith, positivity, decide, or simp) that formally proves the answer.
 
 STRICT RULES:
-1. NEVER use `sorry`, `admit`, or custom `axiom`.
+1. NEVER emit unproven placeholders or custom axioms; every theorem must be completely proved.
 2. Output ONLY valid JSON with keys:
    {"is_math": true, "answer": "...", "lean_statement": "example ... := by ...", "back_translation": "...", "reasoning": "..."}
 3. If the prompt is NOT a mathematical problem, output: {"is_math": false}.
@@ -73,15 +73,16 @@ STRICT RULES:
 
 def _looks_like_math(problem: str) -> bool:
     p_l = problem.lower()
-    if re.search(r"[0-9=<>+\-*/^∫∂√π]|<=|>=|≠|≤|≥|∣", problem):
+    if re.search(r"[0-9=<>+\-*/^∫∂√π∇!]|<=|>=|≠|≤|≥|∣", problem):
         return True
     if re.search(r"\bis\s+(?:\d|prime|divisible|equal|greater|less)", p_l):
         return True
     math_words = (
         "prove", "verify", "show that", "does ", "divide", "divisible",
         "mod", "modulo", "remainder", "gcd", "lcm", "factorial", "choose",
-        "binomial", "sum of", "partial derivative", "determinant", "matrix",
-        "dot product", "inequality", "identity", "polynomial", "factor",
+        "binomial", "sum of", "partial derivative", "gradient", "determinant", "matrix",
+        "dot product", "cross product", "magnitude", "norm of", "system",
+        "inequality", "identity", "polynomial", "factor",
         "simplify", "expand", "evaluate", "compute", "calculate", "derivative",
         "integral", "solve", "prime", "square", "cube", "root",
     )
@@ -122,20 +123,62 @@ def _safe_sympy(expr_str: str) -> sp.Expr:
     return parse_expr(cleaned, local_dict=local_dict, transformations=_TRANSFORMS)
 
 
+def _fmt_rational(val: sp.Expr) -> str:
+    if getattr(val, "is_Integer", False) or val == int(val):
+        return str(int(val))
+    return str(val)
+
+
 def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
     p = problem.strip()
     p_l = p.lower()
 
-    # 1. Partial Derivatives: ∂/∂x or "partial derivative of ... with respect to x/y/z"
-    m_pd = re.search(
-        r"(?:partial\s+derivative\s+(?:of\s+)?|∂\s*/\s*∂\s*([xyz])\s*(?:of\s+)?)(.+?)(?:\s+(?:with\s+respect\s+to|w\.?r\.?t\.?)\s+([xyz]))?$",
-        p,
-        re.I,
-    )
+    # 1. Multivariable Gradient (∇f)
+    if "gradient" in p_l or "∇" in p:
+        m_grad = re.search(r"(?:gradient\s+(?:of\s+)?|∇\s*)(?:f\([^)]+\)\s*=\s*)?(.+?)[?.!]*$", p, re.I)
+        if m_grad:
+            raw_expr = m_grad.group(1).strip()
+            try:
+                sym_expr = _safe_sympy(raw_expr)
+                vars_list = sorted({str(s) for s in sym_expr.free_symbols}, key=lambda v: ("xyz".find(v) if v in "xyz" else 99, v))
+                if not vars_list:
+                    vars_list = ["x", "y"]
+                partials = [sp.simplify(sp.diff(sym_expr, sp.Symbol(v))) for v in vars_list]
+                binders = " ".join(vars_list)
+                lean_expr = _to_lean_expr(str(sym_expr))
+                conjuncts = []
+                for v, d_v in zip(vars_list, partials):
+                    conjuncts.append(f"deriv (fun {v} => {lean_expr}) {v} = {_to_lean_expr(str(d_v))}")
+                simp_tactic = (
+                    "simp (disch := fun_prop) [deriv_comp, deriv_mul, deriv_add, deriv_sub, deriv_div, "
+                    "deriv_pow, Real.deriv_sin, Real.deriv_cos, Real.deriv_exp, Real.deriv_log]; try ring"
+                )
+                n_c = len(conjuncts)
+                if n_c == 1:
+                    lean_stmt = f"example ({binders} : ℝ) : {conjuncts[0]} := by\n  {simp_tactic}"
+                else:
+                    holes = ", ".join(["?_"] * n_c)
+                    lean_stmt = f"example ({binders} : ℝ) : {' ∧ '.join(conjuncts)} := by\n  refine ⟨{holes}⟩ <;> ({simp_tactic})"
+                grad_disp = "(" + ", ".join(str(d).replace("**", "^") for d in partials) + ")"
+                return GeneralizedProposal(
+                    subkind="generalized_gradient",
+                    candidate_answer=grad_disp,
+                    lean_statement=lean_stmt,
+                    back_translation=f"Find the gradient of {raw_expr} with respect to ({', '.join(vars_list)}). The gradient vector is {grad_disp}.",
+                    reasoning=f"Computing each partial derivative ({', '.join(f'∂/∂{v}' for v in vars_list)}) gives {grad_disp}.",
+                )
+            except Exception:
+                pass
+
+    # 2. Partial Derivatives: ∂/∂x or "partial derivative of ... with respect to x/y/z"
     if "partial" in p_l or "∂" in p:
         var_m = re.search(r"(?:with\s+respect\s+to|w\.?r\.?t\.?|∂\s*/\s*∂)\s*([xyz])", p_l)
         wrt = var_m.group(1) if var_m else "x"
-        expr_m = re.search(r"(?:partial\s+derivative\s+(?:of\s+)?|∂/∂[xyz]\s*(?:of\s+)?)(.+?)(?:\s+(?:with\s+respect\s+to|w\.?r\.?t\.?)\s+[xyz].*)?$", p, re.I)
+        expr_m = re.search(
+            r"(?:partial\s+derivative\s+(?:of\s+)?|∂/∂[xyz]\s*(?:of\s+)?)(.+?)(?:\s+(?:with\s+respect\s+to|w\.?r\.?t\.?)\s+[xyz].*)?$",
+            p,
+            re.I,
+        )
         if expr_m:
             raw_expr = re.sub(r"^[fgh]\([^)]+\)\s*=\s*", "", expr_m.group(1).strip()).rstrip("?.!")
             try:
@@ -162,7 +205,77 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             except Exception:
                 pass
 
-    # 2. 2x2 Matrix Determinant: [[a, b], [c, d]]
+    # 3. Linear Systems (2x2 or 3x3): "Solve the system: 2x + 3y = 13, x - y = -1"
+    if "system" in p_l or (p.count("=") >= 2 and any(sep in p for sep in (",", ";", " and "))):
+        body = re.sub(r"^.*?(?:system(?:\s+of\s+equations)?\s*:?)\s*", "", p, flags=re.I)
+        raw_eqs = [eq.strip().rstrip("?.!") for eq in re.split(r"[;,]|(?:\band\b)", body) if "=" in eq]
+        if 2 <= len(raw_eqs) <= 3:
+            try:
+                sym_eqs = []
+                all_syms = set()
+                parsed_halves = []
+                for eq in raw_eqs:
+                    lhs_s, rhs_s = eq.split("=", 1)
+                    l_e, r_e = _safe_sympy(lhs_s), _safe_sympy(rhs_s)
+                    sym_eqs.append(sp.Eq(l_e, r_e))
+                    all_syms |= l_e.free_symbols | r_e.free_symbols
+                    parsed_halves.append((l_e, r_e))
+                vars_sorted = sorted(all_syms, key=lambda s: ("xyz".find(str(s)) if str(s) in "xyz" else 99, str(s)))
+                if len(vars_sorted) == len(raw_eqs):
+                    sol = sp.solve(sym_eqs, vars_sorted, dict=True)
+                    if sol and len(sol) == 1:
+                        sol_map = sol[0]
+                        ans_parts = [f"{v} = {_fmt_rational(sol_map[v])}" for v in vars_sorted]
+                        ans_disp = ", ".join(ans_parts)
+                        # Build Lean conjunction substituting verified roots back into every equation
+                        checks = []
+                        for idx_eq, (l_e, r_e) in enumerate(parsed_halves):
+                            l_sub, r_sub = l_e, r_e
+                            for v in vars_sorted:
+                                val_s = f"({_fmt_rational(sol_map[v])})"
+                                l_sub = l_sub.subs(v, sp.Symbol(val_s))
+                                r_sub = r_sub.subs(v, sp.Symbol(val_s))
+                            l_str = _to_lean_expr(str(l_e))
+                            r_str = _to_lean_expr(str(r_e))
+                            for v in vars_sorted:
+                                val_lean = f"({_fmt_rational(sol_map[v])} : ℝ)"
+                                l_str = re.sub(rf"\b{re.escape(str(v))}\b", val_lean, l_str)
+                                r_str = re.sub(rf"\b{re.escape(str(v))}\b", val_lean, r_str)
+                            checks.append(f"({l_str} : ℝ) = ({r_str} : ℝ)")
+                        lean_stmt = f"example : {' ∧ '.join(checks)} := by norm_num"
+                        return GeneralizedProposal(
+                            subkind="generalized_linear_system",
+                            candidate_answer=ans_disp,
+                            lean_statement=lean_stmt,
+                            back_translation=f"Solve the linear system {'; '.join(raw_eqs)}. The solution is {ans_disp}.",
+                            reasoning=f"Eliminating variables across the {len(raw_eqs)} linear equations gives {ans_disp}.",
+                        )
+            except Exception:
+                pass
+
+    # 4. 3x3 Matrix Determinant: [[a1,a2,a3],[b1,b2,b3],[c1,c2,c3]]
+    num_pat = r"(-?\d+(?:\.\d+)?)"
+    row3_pat = rf"\[\s*{num_pat}\s*,\s*{num_pat}\s*,\s*{num_pat}\s*\]"
+    m_det3 = re.search(rf"determinant.*?\[\s*{row3_pat}\s*,\s*{row3_pat}\s*,\s*{row3_pat}\s*\]", p_l)
+    if m_det3:
+        vals = [sp.Rational(x) for x in m_det3.groups()]
+        a1, a2, a3, b1, b2, b3, c1, c2, c3 = vals
+        det_val = a1 * (b2 * c3 - b3 * c2) - a2 * (b1 * c3 - b3 * c1) + a3 * (b1 * c2 - b2 * c1)
+        det_s = _fmt_rational(det_val)
+        lean_stmt = (
+            f"example : ({a1} : ℝ) * (({b2}) * ({c3}) - ({b3}) * ({c2})) "
+            f"- ({a2}) * (({b1}) * ({c3}) - ({b3}) * ({c1})) "
+            f"+ ({a3}) * (({b1}) * ({c2}) - ({b2}) * ({c1})) = {det_s} := by norm_num"
+        )
+        return GeneralizedProposal(
+            subkind="generalized_linear_algebra",
+            candidate_answer=det_s,
+            lean_statement=lean_stmt,
+            back_translation=f"Find the determinant of the 3x3 matrix [[{a1}, {a2}, {a3}], [{b1}, {b2}, {b3}], [{c1}, {c2}, {c3}]]. The determinant is {det_s}.",
+            reasoning=f"Expanding along the first row via cofactors yields determinant = {det_s}.",
+        )
+
+    # 5. 2x2 Matrix Determinant: [[a, b], [c, d]]
     m_det = re.search(
         r"determinant.*?\[\s*\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]\s*,\s*\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]\s*\]",
         p_l,
@@ -170,7 +283,7 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
     if m_det:
         a, b, c, d = m_det.groups()
         det_val = sp.Rational(a) * sp.Rational(d) - sp.Rational(b) * sp.Rational(c)
-        det_s = str(int(det_val)) if det_val == int(det_val) else str(det_val)
+        det_s = _fmt_rational(det_val)
         lean_stmt = f"example : ({a} : ℝ) * ({d}) - ({b}) * ({c}) = {det_s} := by norm_num"
         return GeneralizedProposal(
             subkind="generalized_linear_algebra",
@@ -180,7 +293,39 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             reasoning=f"For a 2x2 matrix [[a, b], [c, d]], det = a*d - b*c = ({a})*({d}) - ({b})*({c}) = {det_s}.",
         )
 
-    # 3. Vector Dot Product: dot product of (a, b, ...) and (c, d, ...)
+    # 6. 3D Vector Cross Product: cross product of (a1, a2, a3) and (b1, b2, b3)
+    m_cross = re.search(
+        r"cross\s+product.*?\(\s*([^\)]+)\s*\)\s*(?:and|with|×|x)\s*\(\s*([^\)]+)\s*\)",
+        p_l,
+    )
+    if m_cross:
+        v1 = [x.strip() for x in m_cross.group(1).split(",")]
+        v2 = [x.strip() for x in m_cross.group(2).split(",")]
+        if len(v1) == 3 and len(v2) == 3:
+            try:
+                u1, u2, u3 = (sp.Rational(x) for x in v1)
+                w1, w2, w3 = (sp.Rational(x) for x in v2)
+                c1 = u2 * w3 - u3 * w2
+                c2 = u3 * w1 - u1 * w3
+                c3 = u1 * w2 - u2 * w1
+                c1s, c2s, c3s = _fmt_rational(c1), _fmt_rational(c2), _fmt_rational(c3)
+                ans_disp = f"({c1s}, {c2s}, {c3s})"
+                lean_stmt = (
+                    f"example : (({u2} : ℝ) * ({w3}) - ({u3}) * ({w2}) = ({c1s})) ∧ "
+                    f"(({u3} : ℝ) * ({w1}) - ({u1}) * ({w3}) = ({c2s})) ∧ "
+                    f"(({u1} : ℝ) * ({w2}) - ({u2}) * ({w1}) = ({c3s})) := by norm_num"
+                )
+                return GeneralizedProposal(
+                    subkind="generalized_linear_algebra",
+                    candidate_answer=ans_disp,
+                    lean_statement=lean_stmt,
+                    back_translation=f"Find the cross product of ({u1}, {u2}, {u3}) and ({w1}, {w2}, {w3}). The result is {ans_disp}.",
+                    reasoning=f"Computing u × w = (u₂w₃ − u₃w₂, u₃w₁ − u₁w₃, u₁w₂ − u₂w₁) gives {ans_disp}.",
+                )
+            except Exception:
+                pass
+
+    # 7. Vector Dot Product: dot product of (a, b, ...) and (c, d, ...)
     m_dot = re.search(
         r"dot\s+product.*?\(\s*([^\)]+)\s*\)\s*(?:and|with|·|\*)\s*\(\s*([^\)]+)\s*\)",
         p_l,
@@ -192,7 +337,7 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             try:
                 terms = [f"({a} : ℝ) * ({b})" for a, b in zip(v1, v2)]
                 total = sum(sp.Rational(a) * sp.Rational(b) for a, b in zip(v1, v2))
-                tot_s = str(int(total)) if total == int(total) else str(total)
+                tot_s = _fmt_rational(total)
                 lean_stmt = f"example : {' + '.join(terms)} = {tot_s} := by norm_num"
                 return GeneralizedProposal(
                     subkind="generalized_linear_algebra",
@@ -204,18 +349,38 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             except Exception:
                 pass
 
-    # 4. Divisibility: "Does a divide b?" / "Is b divisible by a?"
+    # 8. Vector Magnitude / Euclidean Norm: norm/magnitude of vector (3, 4, 12)
+    m_norm = re.search(r"(?:magnitude|norm|length)\s+(?:of\s+(?:the\s+)?(?:vector\s+)?)?\(\s*([^\)]+)\s*\)", p_l)
+    if m_norm:
+        comps = [x.strip() for x in m_norm.group(1).split(",")]
+        if comps:
+            try:
+                sq_sum = sum(sp.Rational(c) ** 2 for c in comps)
+                norm_val = sp.sqrt(sq_sum)
+                ans_disp = str(norm_val).replace("**", "^")
+                sq_terms = " + ".join(f"({c} : ℝ)^2" for c in comps)
+                if getattr(norm_val, "is_Rational", False):
+                    nv_s = _fmt_rational(norm_val)
+                    lean_stmt = f"example : ({sq_terms}) = ({nv_s} : ℝ)^2 := by norm_num"
+                else:
+                    lean_stmt = f"example : ({sq_terms}) = ({_fmt_rational(sq_sum)} : ℝ) := by norm_num"
+                return GeneralizedProposal(
+                    subkind="generalized_linear_algebra",
+                    candidate_answer=ans_disp,
+                    lean_statement=lean_stmt,
+                    back_translation=f"Find the magnitude of vector ({', '.join(comps)}). The norm is {ans_disp} (squared norm {_fmt_rational(sq_sum)}).",
+                    reasoning=f"Summing squared components gives {_fmt_rational(sq_sum)}, so the Euclidean norm is {ans_disp}.",
+                )
+            except Exception:
+                pass
+
+    # 9. Divisibility: "Does a divide b?" / "Is b divisible by a?"
     m_div1 = re.search(r"does\s+(\d+)\s+divide\s+(\d+)", p_l)
     m_div2 = re.search(r"is\s+(\d+)\s+divisible\s+by\s+(\d+)", p_l)
     if m_div1 or m_div2:
         a, b = (m_div1.group(1), m_div1.group(2)) if m_div1 else (m_div2.group(2), m_div2.group(1))
         a_i, b_i = int(a), int(b)
         is_true = (a_i != 0 and b_i % a_i == 0)
-        # Propose the literal affirmative divisibility theorem if asked to prove/check;
-        # Wait: if asked "Does 7 divide 100?", Lean verifies `7 ∣ 100` (which Lean REJECTS if false!).
-        # If the question asks "Does a divide b?", propose the positive claim only if true?
-        # Even better: when user asserts or tests divisibility, let Lean prove `a ∣ b` when true,
-        # OR if user says "Prove that 7 divides 100", propose `7 ∣ 100` so Lean REJECTS the false claim!
         if "prove" in p_l or "show" in p_l or "verify" in p_l or is_true:
             lean_stmt = f"example : ({a_i} : ℕ) ∣ {b_i} := by decide"
             return GeneralizedProposal(
@@ -226,7 +391,6 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 reasoning=f"Check divisibility {b_i} mod {a_i} = {b_i % a_i if a_i else 'undefined'}.",
             )
         else:
-            # Question "Does 7 divide 100?" when false: verify the negative theorem `¬ (7 ∣ 100)`
             lean_stmt = f"example : ¬ (({a_i} : ℕ) ∣ {b_i}) := by decide"
             return GeneralizedProposal(
                 subkind="generalized_number_theory",
@@ -236,7 +400,7 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 reasoning=f"{b_i} divided by {a_i} leaves remainder {b_i % a_i} ≠ 0, so {a_i} does not divide {b_i}.",
             )
 
-    # 5. Modular arithmetic / GCD / LCM / Binomial / Factorial
+    # 10. Modular arithmetic / GCD / LCM / Factorial / Binomial / Finite Sum
     m_mod = re.search(r"(\d+)\s*(?:mod|modulo|%)\s*(\d+)", p_l)
     if m_mod:
         a_i, m_i = int(m_mod.group(1)), int(m_mod.group(2))
@@ -261,6 +425,31 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             back_translation=f"Find gcd({a_i}, {b_i}). The answer is {g}.",
             reasoning=f"Using Euclidean division, the greatest common divisor of {a_i} and {b_i} is {g}.",
         )
+
+    m_lcm = re.search(r"\blcm\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p_l)
+    if m_lcm:
+        a_i, b_i = int(m_lcm.group(1)), int(m_lcm.group(2))
+        l_val = math.lcm(a_i, b_i)
+        return GeneralizedProposal(
+            subkind="generalized_number_theory",
+            candidate_answer=str(l_val),
+            lean_statement=f"example : Nat.lcm {a_i} {b_i} = {l_val} := by decide",
+            back_translation=f"Find lcm({a_i}, {b_i}). The answer is {l_val}.",
+            reasoning=f"Using lcm(a, b) = (a * b) / gcd(a, b), lcm({a_i}, {b_i}) = {l_val}.",
+        )
+
+    m_fact = re.search(r"(?:\bfactorial\s+(?:of\s+)?(\d+)|(\d+)\s*!)", p_l)
+    if m_fact:
+        n_i = int(m_fact.group(1) or m_fact.group(2))
+        if 0 <= n_i <= 12:
+            val = math.factorial(n_i)
+            return GeneralizedProposal(
+                subkind="generalized_series_combinatorics",
+                candidate_answer=str(val),
+                lean_statement=f"example : Nat.factorial {n_i} = {val} := by decide",
+                back_translation=f"Compute {n_i}!. The factorial is {val}.",
+                reasoning=f"Multiplying integers from 1 up to {n_i} gives {val}.",
+            )
 
     m_choose = re.search(r"(?:choose|C)\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", p, re.I)
     if m_choose:
@@ -288,42 +477,66 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 reasoning=f"Summing 1 + 2 + ... + {n_i} using Gauss pairing gives {n_i}*({n_i}+1)/2 = {total}.",
             )
 
-    # 6. Numeric Inequalities: e.g. "Prove that 2^10 > 1000" or "Is 3/7 < 1/2?"
+    # 11. Numeric & Symbolic Inequalities (both true and false claims!)
     m_ineq = re.search(
-        r"(?:prove\s+that|show\s+that|verify\s+that|is|check\s+(?:whether|if))?\s*([0-9\+\-\*\/\^\(\)\s\.]+?)\s*(<=|>=|≤|≥|<|>)\s*([0-9\+\-\*\/\^\(\)\s\.]+?)[?.!]*$",
+        r"(?:prove\s+that|show\s+that|verify\s+that|is|check\s+(?:whether|if))?\s*(.+?)\s*(<=|>=|≤|≥|<|>)\s*(.+?)[?.!]*$",
         p_l,
     )
-    if m_ineq and not re.search(r"[a-zA-Z]", m_ineq.group(1) + m_ineq.group(3)):
+    if m_ineq and "=" not in m_ineq.group(1) and "=" not in m_ineq.group(3):
         lhs_s, op_s, rhs_s = m_ineq.group(1).strip(), m_ineq.group(2), m_ineq.group(3).strip()
         op_map = {"<=": "≤", ">=": "≥", "≤": "≤", "≥": "≥", "<": "<", ">": ">"}
         lean_op = op_map[op_s]
+        has_vars = bool(re.search(r"[a-zA-Z]", lhs_s + rhs_s))
         try:
-            l_val = _safe_sympy(lhs_s)
-            r_val = _safe_sympy(rhs_s)
-            is_true = bool(
-                (lean_op == "<" and l_val < r_val)
-                or (lean_op == ">" and l_val > r_val)
-                or (lean_op == "≤" and l_val <= r_val)
-                or (lean_op == "≥" and l_val >= r_val)
-            )
-            if "prove" in p_l or "show" in p_l or "verify" in p_l or is_true:
-                lean_stmt = f"example : ({lhs_s} : ℝ) {lean_op} ({rhs_s} : ℝ) := by norm_num"
-                ans_txt = f"True ({lhs_s} {lean_op} {rhs_s})" if is_true else f"{lhs_s} {lean_op} {rhs_s}"
+            l_sym = _safe_sympy(lhs_s)
+            r_sym = _safe_sympy(rhs_s)
+            if not has_vars:
+                is_true = bool(
+                    (lean_op == "<" and l_sym < r_sym)
+                    or (lean_op == ">" and l_sym > r_sym)
+                    or (lean_op == "≤" and l_sym <= r_sym)
+                    or (lean_op == "≥" and l_sym >= r_sym)
+                )
+                if "prove" in p_l or "show" in p_l or "verify" in p_l or is_true:
+                    lean_stmt = f"example : ({lhs_s} : ℝ) {lean_op} ({rhs_s} : ℝ) := by norm_num"
+                    ans_txt = f"True ({lhs_s} {lean_op} {rhs_s})" if is_true else f"{lhs_s} {lean_op} {rhs_s}"
+                else:
+                    lean_stmt = f"example : ¬ (({lhs_s} : ℝ) {lean_op} ({rhs_s} : ℝ)) := by norm_num"
+                    ans_txt = f"False (¬ ({lhs_s} {lean_op} {rhs_s}))"
+                return GeneralizedProposal(
+                    subkind="generalized_inequality",
+                    candidate_answer=ans_txt,
+                    lean_statement=lean_stmt,
+                    back_translation=f"Compare {lhs_s} {op_s} {rhs_s}. Result: {ans_txt}.",
+                    reasoning=f"Evaluating both sides numerically: {lhs_s} = {l_sym} and {rhs_s} = {r_sym}.",
+                )
             else:
-                lean_stmt = f"example : ¬ (({lhs_s} : ℝ) {lean_op} ({rhs_s} : ℝ)) := by norm_num"
-                ans_txt = f"False (¬ ({lhs_s} {lean_op} {rhs_s}))"
-            return GeneralizedProposal(
-                subkind="generalized_inequality",
-                candidate_answer=ans_txt,
-                lean_statement=lean_stmt,
-                back_translation=f"Compare {lhs_s} {op_s} {rhs_s}. Result: {ans_txt}.",
-                reasoning=f"Evaluating both sides numerically: {lhs_s} = {l_val} and {rhs_s} = {r_val}.",
-            )
+                free_vars = sorted({str(s) for s in (l_sym.free_symbols | r_sym.free_symbols)})
+                binders = " ".join(free_vars)
+                lean_lhs = _to_lean_expr(str(l_sym))
+                lean_rhs = _to_lean_expr(str(r_sym))
+                # Try nlinarith with square-nonneg hints (e.g. sq_nonneg (x - y)) + positivity fallback
+                hint = ""
+                if len(free_vars) == 2:
+                    v0, v1 = free_vars[0], free_vars[1]
+                    hint = f" [sq_nonneg ({v0} - {v1}), sq_nonneg ({v0} + {v1})]"
+                elif len(free_vars) == 1:
+                    hint = f" [sq_nonneg ({free_vars[0]})]"
+                lean_stmt = (
+                    f"example ({binders} : ℝ) : {lean_lhs} {lean_op} {lean_rhs} := by\n"
+                    f"  first | positivity | nlinarith{hint}"
+                )
+                return GeneralizedProposal(
+                    subkind="generalized_symbolic_inequality",
+                    candidate_answer=f"{lhs_s} {lean_op} {rhs_s}",
+                    lean_statement=lean_stmt,
+                    back_translation=f"Prove the symbolic inequality {lhs_s} {op_s} {rhs_s}.",
+                    reasoning=f"Testing whether {lhs_s} {lean_op} {rhs_s} holds for all real values ({', '.join(free_vars)}).",
+                )
         except Exception:
             pass
 
-    # 7. Algebraic / Polynomial Identities (both true & false claim stress tests!)
-    # Matches "Prove that <LHS> = <RHS>", "Verify <LHS> = <RHS>", "Check whether <LHS> = <RHS>"
+    # 12. Algebraic / Polynomial / Trigonometric Identities (true & false claim stress tests!)
     m_id = re.search(
         r"(?:prove\s+that|show\s+that|verify\s+that|verify|check\s+(?:whether|if)|is\s+it\s+true\s+that)\s+(.+?)\s*=\s*(.+?)[?.!]*$",
         p_l,
@@ -337,62 +550,30 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
             free_vars = sorted({str(s) for s in (l_sym.free_symbols | r_sym.free_symbols)})
             lean_lhs = _to_lean_expr(str(l_sym))
             lean_rhs = _to_lean_expr(str(r_sym))
-            if free_vars:
+            is_trig = any(fn in (lhs_raw + rhs_raw) for fn in ("sin", "cos", "tan"))
+            if is_trig and free_vars:
+                binders = " ".join(free_vars)
+                v0 = free_vars[0]
+                lean_stmt = (
+                    f"example ({binders} : ℝ) : {lean_lhs} = {lean_rhs} := by\n"
+                    f"  try simp [Real.sin_sq_add_cos_sq, Real.cos_two_mul, Real.sin_two_mul]\n"
+                    f"  try (ring_nf; rw [← Real.sin_sq_add_cos_sq {v0}]; ring)\n"
+                    f"  try ring"
+                )
+                subk = "generalized_trig_identity"
+            elif free_vars:
                 binders = " ".join(free_vars)
                 lean_stmt = f"example ({binders} : ℝ) : {lean_lhs} = {lean_rhs} := by ring"
+                subk = "generalized_identity"
             else:
                 lean_stmt = f"example : ({lean_lhs} : ℝ) = ({lean_rhs} : ℝ) := by norm_num"
+                subk = "generalized_identity"
             return GeneralizedProposal(
-                subkind="generalized_identity",
+                subkind=subk,
                 candidate_answer=f"{lhs_raw} = {rhs_raw}",
                 lean_statement=lean_stmt,
                 back_translation=f"Verify whether {lhs_raw} = {rhs_raw}.",
-                reasoning=f"Checking algebraic equivalence between {lhs_raw} and {rhs_raw}.",
-            )
-        except Exception:
-            pass
-
-    # 8. General polynomial expansion / factorization ("Expand (x+y)^3", "Factor x^3 - y^3")
-    m_exp = re.search(r"^(?:expand|multiply\s+out)\s+(.+?)[?.!]*$", p_l)
-    if m_exp:
-        raw_expr = m_exp.group(1).strip()
-        try:
-            sym_e = _safe_sympy(raw_expr)
-            expanded = sp.expand(sym_e)
-            free_vars = sorted({str(s) for s in (sym_e.free_symbols | expanded.free_symbols)})
-            binders = f"({' '.join(free_vars)} : ℝ) " if free_vars else ""
-            lean_lhs = _to_lean_expr(str(sym_e))
-            lean_rhs = _to_lean_expr(str(expanded))
-            ans_disp = str(expanded).replace("**", "^")
-            lean_stmt = f"example {binders}: {lean_lhs} = {lean_rhs} := by ring"
-            return GeneralizedProposal(
-                subkind="generalized_identity",
-                candidate_answer=ans_disp,
-                lean_statement=lean_stmt,
-                back_translation=f"Expand {raw_expr}. The expanded form is {ans_disp}.",
-                reasoning=f"Expanding {raw_expr} by distributivity yields {ans_disp}.",
-            )
-        except Exception:
-            pass
-
-    m_fac = re.search(r"^(?:factor|factorize)\s+(.+?)[?.!]*$", p_l)
-    if m_fac:
-        raw_expr = m_fac.group(1).strip()
-        try:
-            sym_e = _safe_sympy(raw_expr)
-            factored = sp.factor(sym_e)
-            free_vars = sorted({str(s) for s in (sym_e.free_symbols | factored.free_symbols)})
-            binders = f"({' '.join(free_vars)} : ℝ) " if free_vars else ""
-            lean_lhs = _to_lean_expr(str(sym_e))
-            lean_rhs = _to_lean_expr(str(factored))
-            ans_disp = str(factored).replace("**", "^")
-            lean_stmt = f"example {binders}: {lean_lhs} = {lean_rhs} := by ring"
-            return GeneralizedProposal(
-                subkind="generalized_identity",
-                candidate_answer=ans_disp,
-                lean_statement=lean_stmt,
-                back_translation=f"Factor {raw_expr}. The factored form is {ans_disp}.",
-                reasoning=f"Factoring {raw_expr} yields {ans_disp}.",
+                reasoning=f"Checking symbolic equivalence between {lhs_raw} and {rhs_raw}.",
             )
         except Exception:
             pass
@@ -458,8 +639,7 @@ def propose_generalized(problem: str, feedback: Optional[str] = None) -> General
         except Exception as e:
             logger.warning(f"Generalized LLM proposal failed, trying symbolic autoformalizer: {e}")
 
-    # 2. Generalized Symbolic Autoformalizer (covers unseen identities, inequalities,
-    #    divisibility/mod/gcd, sums/combinatorics, partial derivatives, matrices/vectors)
+    # 2. Generalized Symbolic Autoformalizer
     sym_prop = _propose_symbolic(problem)
     if sym_prop is not None:
         return sym_prop

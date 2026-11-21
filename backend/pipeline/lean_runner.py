@@ -413,7 +413,22 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             conjuncts = eq_part.split("∧")
             all_ok = True
             for c in conjuncts:
-                c_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R)\)", r"(\1)", c).strip()
+                c_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R)(?=\))", "", c).strip()
+                while c_clean.startswith("(") and c_clean.endswith(")"):
+                    depth = 0
+                    balanced_outer = True
+                    for idx_ch, ch in enumerate(c_clean):
+                        if ch == "(":
+                            depth += 1
+                        elif ch == ")":
+                            depth -= 1
+                            if depth == 0 and idx_ch < len(c_clean) - 1:
+                                balanced_outer = False
+                                break
+                    if balanced_outer and depth == 0:
+                        c_clean = c_clean[1:-1].strip()
+                    else:
+                        break
                 if "=" in c_clean:
                     h0, h1 = c_clean.split("=", 1)
                     lhs_str = _py_expr(h0)
@@ -771,7 +786,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             return bool(sympy.simplify(diff(diff(f, x), x) - d2_claimed) == 0)
 
         # ── Derivative / Partial Derivative / Indefinite Integral ───────────────
-        m = re.search(r"deriv\s*\(\s*fun\s+([xyzat])\s*=>\s*(.+?)\s*\)\s*\1\s*=\s*(.+?)\s*:= by", stmt)
+        m = None if "∧" in stmt else re.search(r"deriv\s*\(\s*fun\s+([xyzat])\s*=>\s*(.+?)\s*\)\s*\1\s*=\s*(.+?)\s*:= by", stmt)
         if m:
             var_sym = sympy.Symbol(m.group(1))
             loc = {
@@ -908,8 +923,27 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             conjuncts = eq_part.split("∧")
             all_ok = True
             for c in conjuncts:
-                c_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R)\)", r"(\1)", c).strip()
-                if "=" in c_clean:
+                c_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R)(?=\))", "", c).strip()
+                while c_clean.startswith("(") and c_clean.endswith(")"):
+                    depth = 0
+                    balanced_outer = True
+                    for idx_ch, ch in enumerate(c_clean):
+                        if ch == "(":
+                            depth += 1
+                        elif ch == ")":
+                            depth -= 1
+                            if depth == 0 and idx_ch < len(c_clean) - 1:
+                                balanced_outer = False
+                                break
+                    if balanced_outer and depth == 0:
+                        c_clean = c_clean[1:-1].strip()
+                    else:
+                        break
+                if "deriv" in c_clean:
+                    if not _verify_with_sympy(f"example (x y z : ℝ) : {c_clean} := by simp"):
+                        all_ok = False
+                        break
+                elif "=" in c_clean:
                     h0, h1 = c_clean.split("=", 1)
                     lhs = sympify(_py_expr(h0), locals={"sympy": sympy, "sqrt": sympy.sqrt})
                     rhs = sympify(_py_expr(h1), locals={"sympy": sympy, "sqrt": sympy.sqrt})
@@ -951,6 +985,16 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             import math
             return math.comb(int(m_ch.group(1)), int(m_ch.group(2))) == int(m_ch.group(3))
 
+        m_fact = re.match(r"^Nat\.factorial\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_fact:
+            import math
+            return math.factorial(int(m_fact.group(1))) == int(m_fact.group(2))
+
+        m_lcm = re.match(r"^Nat\.lcm\s+(\d+)\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_lcm:
+            import math
+            return math.lcm(int(m_lcm.group(1)), int(m_lcm.group(2))) == int(m_lcm.group(3))
+
         m_fsum = re.match(r"^\(?\s*∑\s+k\s+∈\s+Finset\.Icc\s+(\d+)\s+(\d+),\s*k\s*\)?\s*=\s*(\d+)$", eq_part.strip())
         if m_fsum:
             lo, hi, tot = int(m_fsum.group(1)), int(m_fsum.group(2)), int(m_fsum.group(3))
@@ -959,23 +1003,54 @@ def _verify_with_sympy(lean_statement: str) -> bool:
         # ── Generalized Inequalities (<, >, ≤, ≥) ─────────────────────────────
         m_ineq = re.match(r"^(.+?)\s*(<=|>=|≤|≥|<|>)\s*(.+)$", eq_part.strip())
         if m_ineq and "=" not in eq_part.replace("<=", "").replace(">=", ""):
-            l_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R|ℕ|Nat)\)", r"(\1)", m_ineq.group(1)).strip()
-            r_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R|ℕ|Nat)\)", r"(\1)", m_ineq.group(3)).strip()
+            l_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat)(?=\))", "", m_ineq.group(1)).strip()
+            r_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat)(?=\))", "", m_ineq.group(3)).strip()
             lv = sympify(_py_expr(l_clean), locals={"sympy": sympy, "sqrt": sympy.sqrt})
             rv = sympify(_py_expr(r_clean), locals={"sympy": sympy, "sqrt": sympy.sqrt})
             op = m_ineq.group(2)
-            if op == "<":
-                return bool(lv < rv)
-            if op == ">":
-                return bool(lv > rv)
-            if op in ("<=", "≤"):
-                return bool(lv <= rv)
-            if op in (">=", "≥"):
-                return bool(lv >= rv)
+            free_syms = sorted(lv.free_symbols | rv.free_symbols, key=str)
+            if not free_syms:
+                if op == "<":
+                    return bool(lv < rv)
+                if op == ">":
+                    return bool(lv > rv)
+                if op in ("<=", "≤"):
+                    return bool(lv <= rv)
+                if op in (">=", "≥"):
+                    return bool(lv >= rv)
+            else:
+                # Sample grid + check difference polynomial / SOS
+                diff_e = sympy.expand(lv - rv)
+                pts = [-3, -1, 0, 1, 2, 3]
+                import itertools
+                for combo in itertools.product(pts, repeat=min(len(free_syms), 3)):
+                    subs_map = dict(zip(free_syms, combo))
+                    val = float(diff_e.subs(subs_map).evalf())
+                    if op == ">" and not (val > 0):
+                        return False
+                    if op in (">=", "≥") and not (val >= 0):
+                        return False
+                    if op == "<" and not (val < 0):
+                        return False
+                    if op in ("<=", "≤") and not (val <= 0):
+                        return False
+                # Verify algebraic non-negativity for 1-var / 2-var quadratics via discriminant or SOS
+                if len(free_syms) == 1:
+                    poly = sympy.Poly(diff_e if op in (">", ">=", "≥") else -diff_e, free_syms[0])
+                    if poly.degree() == 2:
+                        a_c, b_c, c_c = poly.all_coeffs()
+                        disc = b_c**2 - 4*a_c*c_c
+                        return bool(a_c > 0 and (disc < 0 if op in (">", "<") else disc <= 0))
+                if len(free_syms) == 2 and sympy.total_degree(diff_e) == 2:
+                    # Check quadratic form x^2 + y^2 - 2xy etc. via Hessian PSD
+                    H = sympy.hessian(diff_e if op in (">=", "≥") else -diff_e, free_syms)
+                    if all(e >= 0 for e in H.eigenvals()):
+                        return True
+                return False
 
         # ── Generic equality: expr = answer (arithmetic / algebraic) ─────────
         if "=" in eq_part:
-            eq_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R)\)", r"(\1)", eq_part).strip()
+            eq_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat)(?=\))", "", eq_part).strip()
             if "=" in eq_clean:
                 halves = eq_clean.split("=", 1)
                 lhs = sympify(_py_expr(halves[0]), locals={"sympy": sympy, "sqrt": sympy.sqrt})

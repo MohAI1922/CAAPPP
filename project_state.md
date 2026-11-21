@@ -78,7 +78,7 @@ Columns: `(problem_key, problem_text, template_id, verified_answer, lean_stateme
 | Metric | Current Status | Notes |
 | :--- | :--- | :--- |
 | **Registered Templates** | **244** | Complete calculus coverage: arithmetic, algebra, related rates, optimization, integrals, derivatives, higher-order, kinematics, implicit differentiation, geometric volume rates |
-| **Fine-Tuning Dataset Size** | **10,311 entries** | 244/244 templates (100% coverage), 0 `sorry` placeholders, 143 corrupted `implicit_derivative` labels recomputed via SymPy |
+| **Fine-Tuning Dataset Size** | **10,426 entries** | 244/244 templates (100% coverage) + 115 generalized higher-math & non-math guardrail entries, 0 `sorry` placeholders |
 | **Edge Cache Entries** | **1,828 entries** | Sanitized of all Lean syntax in student fields, pre-seeded for $\le 4\text{ ms}$ offline edge demo |
 | **Pedagogical Step Engine** | **Remediated & Verified (100% Complete)** | Deterministic CAS step generator + SymPy student multi-step derivation grader (`POST /grade-steps`), zero Lean syntax in student views, zero KaTeX errors |
 | **Unit Test Suite** | **266 / 266 passing** | 100.0% pass rate (0 failures, 0 regressions across all 15 test suites including novel generalized out-of-domain prover, intuitive explainer, semantic inversion & step grader checks) |
