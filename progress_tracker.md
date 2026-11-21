@@ -564,3 +564,21 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`test_generalized_prover.py`): **18/18** true out-of-domain proofs verified + **5/5** false claims strictly rejected (`187.988s — OK`).
   - Full regression suite: **266 / 266 passing (100.0%)** in `12.826s`.
+
+---
+
+## Phase 21: Frontend Step Grader & Generalized Proof UI + Complex, Log & Exponential Proofs (Completed 2026-11-21)
+
+- **React UI Integration (`frontend/src/components/ResultPanel.jsx`, `frontend/src/components/StepGraderPanel.jsx`, `frontend/src/pages/StudentView.jsx`)**:
+  - Added the `Generalized Out-of-Domain Proof` pill badge and adaptive subtitle in `ResultPanel.jsx` whenever `result.generalized_mode === true`.
+  - Built interactive **Check My Steps** tab (`StepGraderPanel.jsx`) in `StudentView.jsx` wired to `POST /grade-steps`, with preset examples, operation-mode selector (`auto`, `algebra`, `equation`, `derivative`, `integral`), per-step error badges, and summary feedback; rebuilt production bundle (`134.72 kB` JS, `9.63 kB` CSS).
+- **Generalized Math Expansion (`backend/pipeline/generalized_prover.py`, `backend/pipeline/lean_runner.py`, `backend/pipeline/explainer.py`, `backend/templates/registry.py`)**:
+  - Added Lean 4 autoformalization & verification (`Complex.ext`, `Real.log_mul`, `Real.log_div`, `Real.rpow_right_inj`) plus SymPy dev-mode fallback parity for **complex number arithmetic**, **logarithmic product/quotient laws** (rejecting false claims such as `log(a + b) = log(a) + log(b)`), and **exponential equations** (`2^x = 32`).
+  - Fixed word-boundary matching in `lean_runner.py` (`\by\b`) so `:= by constructor` no longer false-triggers implicit tangent parsing.
+  - Added intuitive curriculum guides for complex numbers, logarithmic laws, and exponential equations.
+- **Dataset & Colab Notebook (`scripts/enhance_model_dataset.py`, `verimath_finetune_dataset.jsonl`, `scripts/VeriMath_Colab_FineTuning.ipynb`)**:
+  - Appended 21 verified `sorry`-free pairs (`10,447` total entries, `0` JSON errors, `0` `sorry`).
+  - Added `TEST 10: GENERALIZED OUT-OF-DOMAIN` to Step 6 of `VeriMath_Colab_FineTuning.ipynb`.
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **23/23** true out-of-domain proofs verified + **7/7** false claims strictly rejected (`246.427s — OK`).
+  - Full SymPy dev-mode regression suite: **266 / 266 passing (100.0%)** in `13.781s`.

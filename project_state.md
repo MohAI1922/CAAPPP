@@ -78,10 +78,10 @@ Columns: `(problem_key, problem_text, template_id, verified_answer, lean_stateme
 | Metric | Current Status | Notes |
 | :--- | :--- | :--- |
 | **Registered Templates** | **244** | Complete calculus coverage: arithmetic, algebra, related rates, optimization, integrals, derivatives, higher-order, kinematics, implicit differentiation, geometric volume rates |
-| **Fine-Tuning Dataset Size** | **10,426 entries** | 244/244 templates (100% coverage) + 115 generalized higher-math & non-math guardrail entries, 0 `sorry` placeholders |
+| **Fine-Tuning Dataset Size** | **10,447 entries** | 244/244 templates (100% coverage) + 136 generalized higher-math & non-math guardrail entries, 0 `sorry` placeholders |
 | **Edge Cache Entries** | **1,828 entries** | Sanitized of all Lean syntax in student fields, pre-seeded for $\le 4\text{ ms}$ offline edge demo |
-| **Pedagogical Step Engine** | **Remediated & Verified (100% Complete)** | Deterministic CAS step generator + SymPy student multi-step derivation grader (`POST /grade-steps`), zero Lean syntax in student views, zero KaTeX errors |
-| **Unit Test Suite** | **266 / 266 passing** | 100.0% pass rate (0 failures, 0 regressions across all 15 test suites including novel generalized out-of-domain prover, intuitive explainer, semantic inversion & step grader checks) |
+| **Pedagogical Step Engine** | **Remediated & Verified (100% Complete)** | Deterministic CAS step generator + interactive React & SymPy student derivation grader (`POST /grade-steps`), zero Lean syntax in student views, zero KaTeX errors |
+| **Unit Test Suite** | **266 / 266 passing** | 100.0% pass rate (0 failures, 0 regressions across all 15 test suites including generalized complex/log/exponential proofs, intuitive explainer, semantic inversion & step grader checks) |
 | **Textbook Verification** | **100.0% Verified** | Cross-verified against official Answer Keys (El-Moasser & *Book of Integrals*) with zero discrepancies |
 | **Target Hardware** | **Raspberry Pi 4 (8 GB RAM)** | 4 threads, 4096 context, Qwen2.5-1.5B or 3B Q4_K_M GGUF + Lean 4 Mathlib |
 

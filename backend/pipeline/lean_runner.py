@@ -347,6 +347,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             s = s.replace("Real.arccos", "acos")
             s = s.replace("Real.arcsin", "asin")
             s = s.replace("Real.asec", "asec")
+            s = s.replace("Complex.I", "I")
             s = s.replace("Real.exp", "exp")
             s = s.replace("Real.log", "log")
             s = s.replace("Real.sqrt", "sqrt")
@@ -374,7 +375,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
         if ("hdydx" in stmt or "hden" in stmt) and "hcurve" in stmt:
             return True
 
-        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or ("y" in stmt and ("x -" in stmt or "x =" in stmt))):
+        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or (re.search(r"\by\b", stmt) and ("x -" in stmt or "x =" in stmt))):
             m_tan = re.search(r":\s*\((.+?)\)\s*↔\s*\((.+?)\)\s*:= by", stmt)
             if m_tan:
                 eq1, eq2 = m_tan.groups()
@@ -497,7 +498,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                 return bool(sympy.simplify(calc_slope - ans_v) == 0)
 
         # ── Implicit tangent line equivalence ────────────────────────────────
-        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or ("y" in stmt and ("x -" in stmt or "x =" in stmt))):
+        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or (re.search(r"\by\b", stmt) and ("x -" in stmt or "x =" in stmt))):
             m_tan = re.search(r"\((.+?)\)\s*↔\s*\((.+?)\)\s*:= by", stmt)
             if m_tan:
                 eq1, eq2 = m_tan.groups()
@@ -910,13 +911,15 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                 D = b**2 - 4*a*c
                 return bool(D < 0)
 
-        # ── Linear equation solving: (ax + b = c) ↔ (x = answer) ─────────────
-        m = re.search(r"\((.+?)\s*=\s*(.+?)\)\s*↔\s*\((?:x|[a-zA-Z])\s*=\s*(.+?)\)", eq_part)
+        # ── Linear / Exponential equation solving: (lhs = rhs) ↔ (var = ans) ──
+        eq_clean_iff = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", eq_part).strip()
+        m = re.search(r"\((.+?)\s*=\s*(.+?)\)\s*↔\s*\(([a-zA-Z])\s*=\s*(.+?)\)", eq_clean_iff)
         if m:
             lhs = sympify(_py_expr(m.group(1)))
             rhs = sympify(_py_expr(m.group(2)))
-            ans = sympify(_py_expr(m.group(3)))
-            return bool(lhs.subs(x, ans) == rhs)
+            v_sym = symbols(m.group(3))
+            ans = sympify(_py_expr(m.group(4)))
+            return bool(sympy.simplify(lhs.subs(v_sym, ans) - rhs) == 0)
 
         # ── Conjunction of equalities (A = B ∧ C = D ∧ ...) ──────────────────
         if "∧" in eq_part:
@@ -1048,14 +1051,25 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                         return True
                 return False
 
-        # ── Generic equality: expr = answer (arithmetic / algebraic) ─────────
+        # ── Generic equality: expr = answer (arithmetic / algebraic / complex / log) ──
         if "=" in eq_part:
-            eq_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat)(?=\))", "", eq_part).strip()
+            eq_clean = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", eq_part).strip()
             if "=" in eq_clean:
+                pos_vars = set(re.findall(r"\(\s*[a-zA-Z_]\w*\s*:\s*0\s*<\s*([a-zA-Z])\s*\)", body))
+                sym_locals = {
+                    "sympy": sympy,
+                    "sqrt": sympy.sqrt,
+                    "I": sympy.I,
+                    "pi": sympy.pi,
+                    "log": sympy.log,
+                    "exp": sympy.exp,
+                }
+                for pv in pos_vars:
+                    sym_locals[pv] = sympy.Symbol(pv, positive=True)
                 halves = eq_clean.split("=", 1)
-                lhs = sympify(_py_expr(halves[0]), locals={"sympy": sympy, "sqrt": sympy.sqrt})
-                rhs = sympify(_py_expr(halves[1]), locals={"sympy": sympy, "sqrt": sympy.sqrt})
-                return bool(sympy.simplify(lhs - rhs) == 0)
+                lhs = sympify(_py_expr(halves[0]), locals=sym_locals)
+                rhs = sympify(_py_expr(halves[1]), locals=sym_locals)
+                return bool(sympy.simplify(sympy.expand(lhs - rhs)) == 0)
 
         return False
 

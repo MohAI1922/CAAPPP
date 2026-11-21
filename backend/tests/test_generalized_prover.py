@@ -45,6 +45,11 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             ("Prove that sin(2*x) = 2*sin(x)*cos(x)", "generalized_trig_identity"),
             ("Prove that x^2 + y^2 >= 2*x*y", "generalized_symbolic_inequality"),
             ("Prove that x^2 + 1 > 0", "generalized_symbolic_inequality"),
+            ("Compute (3 + 4i) * (1 - 2i)", "generalized_complex"),
+            ("Prove that (2 + 3i) * (2 - 3i) = 13", "generalized_complex"),
+            ("Prove that log(a * b) = log(a) + log(b)", "generalized_log_identity"),
+            ("Prove that log(a / b) = log(a) - log(b)", "generalized_log_identity"),
+            ("Solve 2^x = 32", "generalized_exponential_equation"),
         ]
         with TestClient(app) as client:
             for prob, expected_kind in cases:
@@ -65,6 +70,8 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
             "Prove that 7 divides 100",
             "Prove that sin(x)^2 + cos(x)^2 = 2",
             "Prove that x^2 + y^2 < 2*x*y",
+            "Prove that (3 + 4i) * (1 - 2i) = 11 + 2i",
+            "Prove that log(a + b) = log(a) + log(b)",
         ]
         with TestClient(app) as client:
             for claim in false_claims:

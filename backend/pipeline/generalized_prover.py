@@ -82,6 +82,7 @@ def _looks_like_math(problem: str) -> bool:
         "mod", "modulo", "remainder", "gcd", "lcm", "factorial", "choose",
         "binomial", "sum of", "partial derivative", "gradient", "determinant", "matrix",
         "dot product", "cross product", "magnitude", "norm of", "system",
+        "complex", "imaginary", "logarithm", "exponential",
         "inequality", "identity", "polynomial", "factor",
         "simplify", "expand", "evaluate", "compute", "calculate", "derivative",
         "integral", "solve", "prime", "square", "cube", "root",
@@ -476,6 +477,143 @@ def _propose_symbolic(problem: str) -> Optional[GeneralizedProposal]:
                 back_translation=f"Find the sum of the first {n_i} positive integers. The sum is {total}.",
                 reasoning=f"Summing 1 + 2 + ... + {n_i} using Gauss pairing gives {n_i}*({n_i}+1)/2 = {total}.",
             )
+
+    # 10b. Complex Number Arithmetic: (a + bi) * (c + di), (a + bi) + (c + di), or identity claims
+    if (
+        "complex" in p_l or re.search(r"(?:\d\s*\*?\s*i\b|[+-]\s*i\b|\(\s*i\b)", p_l)
+    ) and not any(w in p_l for w in ("derivative", "integral", "matrix", "determinant")):
+        def _to_lean_c(expr_txt: str) -> str:
+            s = re.sub(r"\)\s*\(", ") * (", expr_txt.strip())
+            s = re.sub(r"(\d)\s*\(", r"\1 * (", s)
+            s = re.sub(r"(\d)\s*\*?\s*i\b", r"\1 * Complex.I", s)
+            s = re.sub(r"(?<![a-zA-Z_])i(?![a-zA-Z_])", "Complex.I", s)
+            return s
+
+        def _parse_c(expr_txt: str) -> sp.Expr:
+            s = re.sub(r"(\d)\s*i\b", r"\1*I", expr_txt.strip())
+            s = re.sub(r"(?<![a-zA-Z_])i(?![a-zA-Z_])", "I", s)
+            s = s.replace("−", "-").replace("×", "*").replace("·", "*")
+            return parse_expr(s, local_dict={"I": sp.I}, transformations=_TRANSFORMS)
+
+        def _fmt_complex(re_p: sp.Expr, im_p: sp.Expr) -> tuple[str, str]:
+            r_s = _fmt_rational(re_p)
+            if im_p == 0:
+                return f"({r_s} : ℂ)", r_s
+            im_abs = abs(im_p)
+            sign_op = "+" if im_p > 0 else "-"
+            im_lean = "Complex.I" if im_abs == 1 else f"{_fmt_rational(im_abs)} * Complex.I"
+            im_disp = "i" if im_abs == 1 else f"{_fmt_rational(im_abs)}i"
+            if re_p == 0:
+                lean_v = im_lean if im_p > 0 else f"-{im_lean}"
+                disp_v = im_disp if im_p > 0 else f"-{im_disp}"
+            else:
+                lean_v = f"({r_s} : ℂ) {sign_op} {im_lean}"
+                disp_v = f"{r_s} {sign_op} {im_disp}"
+            return lean_v, disp_v
+
+        body_c = re.sub(
+            r"^\s*(?:prove\s+that|show\s+that|verify\s+that|check\s+(?:whether|if)|is\s+it\s+true\s+that|compute|simplify|evaluate|calculate|multiply|add|subtract|find(?:\s+the\s+value\s+of)?)\s+",
+            "",
+            p,
+            flags=re.I,
+        ).rstrip("?.! ").strip()
+        try:
+            if "=" in body_c:
+                c_lhs_raw, c_rhs_raw = [x.strip() for x in body_c.split("=", 1)]
+                _ = _parse_c(c_lhs_raw)
+                _ = _parse_c(c_rhs_raw)
+                lean_lhs_c = _to_lean_c(c_lhs_raw)
+                lean_rhs_c = _to_lean_c(c_rhs_raw)
+                lean_stmt = (
+                    f"example : ({lean_lhs_c} : ℂ) = ({lean_rhs_c} : ℂ) := by\n"
+                    f"  apply Complex.ext <;> simp <;> norm_num"
+                )
+                return GeneralizedProposal(
+                    subkind="generalized_complex",
+                    candidate_answer=f"{c_lhs_raw} = {c_rhs_raw}",
+                    lean_statement=lean_stmt,
+                    back_translation=f"Verify the complex identity {c_lhs_raw} = {c_rhs_raw}.",
+                    reasoning=f"Expanding complex terms with i^2 = -1 and comparing real and imaginary components.",
+                )
+            else:
+                c_expr = _parse_c(body_c)
+                c_exp = sp.expand(c_expr)
+                re_p, im_p = c_exp.as_real_imag()
+                if getattr(re_p, "is_Rational", False) and getattr(im_p, "is_Rational", False):
+                    lean_rhs_c, disp_c = _fmt_complex(re_p, im_p)
+                    lean_lhs_c = _to_lean_c(body_c)
+                    lean_stmt = (
+                        f"example : ({lean_lhs_c} : ℂ) = ({lean_rhs_c}) := by\n"
+                        f"  apply Complex.ext <;> simp <;> norm_num"
+                    )
+                    return GeneralizedProposal(
+                        subkind="generalized_complex",
+                        candidate_answer=disp_c,
+                        lean_statement=lean_stmt,
+                        back_translation=f"Evaluate the complex expression {body_c}. Result: {disp_c}.",
+                        reasoning=f"Distributing terms and substituting i^2 = -1 groups real part {_fmt_rational(re_p)} and imaginary part {_fmt_rational(im_p)} into {disp_c}.",
+                    )
+        except Exception:
+            pass
+
+    # 10c. Logarithmic Product / Quotient Identities (e.g. log(a*b) = log(a) + log(b))
+    if ("=" in p) and ("log(" in p_l or "ln(" in p_l):
+        m_log_id = re.search(
+            r"(?:prove\s+that|show\s+that|verify\s+that|verify|check\s+(?:whether|if)|is\s+it\s+true\s+that)?\s*(.+?)\s*=\s*(.+?)[?.!]*$",
+            p_l,
+        )
+        if m_log_id:
+            lhs_raw = re.sub(r"\s+for\s+(?:all\s+)?.*$", "", m_log_id.group(1).strip())
+            rhs_raw = re.sub(r"\s+for\s+(?:all\s+)?.*$", "", m_log_id.group(2).strip())
+            try:
+                l_sym = _safe_sympy(lhs_raw)
+                r_sym = _safe_sympy(rhs_raw)
+                free_vars = sorted({str(s) for s in (l_sym.free_symbols | r_sym.free_symbols)})
+                if free_vars:
+                    binders = " ".join(free_vars)
+                    pos_hyps = " ".join(f"(h{v} : 0 < {v})" for v in free_vars)
+                    lean_lhs = _to_lean_expr(str(l_sym))
+                    lean_rhs = _to_lean_expr(str(r_sym))
+                    ne_args = " ".join(f"h{v}.ne'" for v in free_vars[:2])
+                    if "/" in lhs_raw or "/" in rhs_raw:
+                        tactic = f"exact Real.log_div {ne_args}"
+                    else:
+                        tactic = f"simp [Real.log_mul {ne_args}, Real.log_div {ne_args}]"
+                    lean_stmt = f"example ({binders} : ℝ) {pos_hyps} : {lean_lhs} = {lean_rhs} := by\n  {tactic}"
+                    return GeneralizedProposal(
+                        subkind="generalized_log_identity",
+                        candidate_answer=f"{lhs_raw} = {rhs_raw}",
+                        lean_statement=lean_stmt,
+                        back_translation=f"Verify for positive variables ({', '.join(free_vars)}) whether {lhs_raw} = {rhs_raw}.",
+                        reasoning=f"Testing the logarithmic identity for positive arguments ({', '.join(free_vars)}).",
+                    )
+            except Exception:
+                pass
+
+    # 10d. Exponential Equations: e.g. "Solve 2^x = 32"
+    m_exp_eq = re.search(r"\b(\d+)\s*\^\s*\(?([a-zA-Z])\)?\s*=\s*(\d+)\b", p)
+    if m_exp_eq and not any(op in p for op in ("<", ">", "≤", "≥")):
+        base_i = int(m_exp_eq.group(1))
+        var_name = m_exp_eq.group(2)
+        rhs_i = int(m_exp_eq.group(3))
+        if base_i > 1 and rhs_i > 0:
+            exp_val = round(math.log(rhs_i, base_i))
+            if base_i ** exp_val == rhs_i:
+                lean_stmt = (
+                    f"example ({var_name} : ℝ) : (({base_i} : ℝ) ^ {var_name} = {rhs_i}) ↔ ({var_name} = {exp_val}) := by\n"
+                    f"  constructor\n"
+                    f"  · intro h\n"
+                    f"    have h1 : ({base_i} : ℝ) ^ {var_name} = ({base_i} : ℝ) ^ ({exp_val} : ℝ) := by norm_num; exact h\n"
+                    f"    exact (Real.rpow_right_inj (by norm_num) (by norm_num)).mp h1\n"
+                    f"  · intro h; subst h; norm_num"
+                )
+                return GeneralizedProposal(
+                    subkind="generalized_exponential_equation",
+                    candidate_answer=f"{var_name} = {exp_val}",
+                    lean_statement=lean_stmt,
+                    back_translation=f"Solve {base_i}^{var_name} = {rhs_i} for real {var_name}. The unique solution is {var_name} = {exp_val}.",
+                    reasoning=f"Rewriting {rhs_i} as {base_i}^{exp_val} matches bases on both sides, yielding {var_name} = {exp_val}.",
+                )
 
     # 11. Numeric & Symbolic Inequalities (both true and false claims!)
     m_ineq = re.search(

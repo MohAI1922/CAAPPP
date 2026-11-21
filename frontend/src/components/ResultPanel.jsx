@@ -300,14 +300,21 @@ export default function ResultPanel({ result }) {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-lg font-bold text-slate-100">Mathematically Proven Correct</h2>
               <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full font-mono">
                 Lean 4 Verified
               </span>
+              {result.generalized_mode && (
+                <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-mono">
+                  Generalized Out-of-Domain Proof
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-400">
-              Verified by Lean 4 interactive theorem prover with zero-trust kernel assurance.
+              {result.generalized_mode
+                ? 'Solved via zero-trust out-of-domain Lean 4 autoformalization & theorem verification.'
+                : 'Verified by Lean 4 interactive theorem prover with zero-trust kernel assurance.'}
             </p>
           </div>
         </div>

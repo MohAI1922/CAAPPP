@@ -64,6 +64,15 @@ GENERALIZED_PROMPTS = [
     "Find choose(10, 3)",
     "Find the sum of the first 10 positive integers",
     "Find the sum of the first 25 positive integers",
+    # Complex Arithmetic
+    "Compute (3 + 4i) * (1 - 2i)",
+    "Simplify (5 - 2i) + (-1 + 7i)",
+    "Prove that (2 + 3i) * (2 - 3i) = 13",
+    # Logarithmic Laws & Exponential Equations
+    "Prove that log(a * b) = log(a) + log(b)",
+    "Prove that log(a / b) = log(a) - log(b)",
+    "Solve 2^x = 32",
+    "Solve 3^x = 81",
 ]
 
 NON_MATH_PROMPTS = [

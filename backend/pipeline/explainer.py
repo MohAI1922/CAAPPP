@@ -302,6 +302,30 @@ _CONCEPT_GUIDES: Dict[str, Dict[str, str]] = {
         ),
         "pitfall": "Test extreme or negative values (like x = −1, y = 1) mentally to make sure an inequality isn't only true for positive numbers.",
     },
+    "generalized_complex": {
+        "title": "Complex Number Arithmetic — Combining Real & Imaginary Parts",
+        "mental_model": "Treat i just like an algebraic variable, distribute normally, and replace every i² with −1; group real terms separately from i terms.",
+        "intuition": (
+            "A complex number a + b·i lives on a 2D plane (horizontal real axis, vertical imaginary axis). Multiplying rotates and scales vectors in that plane, with 90° × 90° = 180° flip accounting for i² = −1."
+        ),
+        "pitfall": "Always convert b·i · d·i = b·d·i² = −b·d (watch the minus sign when two imaginary terms multiply!).",
+    },
+    "generalized_log_identity": {
+        "title": "Logarithmic Laws — Turning Products into Sums",
+        "mental_model": "log(a·b) = log(a) + log(b) and log(a/b) = log(a) − log(b) for positive quantities a, b > 0; logarithms DO NOT distribute over addition.",
+        "intuition": (
+            "Because logarithms measure exponents (how many times you multiply by the base), multiplying numbers corresponds to adding their exponents, and dividing subtracts them."
+        ),
+        "pitfall": "Never expand log(a + b) into log(a) + log(b) — logarithm laws only turn multiplication and division into addition and subtraction.",
+    },
+    "generalized_exponential_equation": {
+        "title": "Exponential Equations — Matching Bases",
+        "mental_model": "Rewrite both sides with the same positive base (b^x = b^k) and equate exponents directly: x = k.",
+        "intuition": (
+            "Exponential curves with base b > 1 strictly climb without ever repeating a height, so each output height corresponds to one unique exponent."
+        ),
+        "pitfall": "Check that the exponential term is isolated before equating exponents, and remember b⁰ = 1 when the right-hand side is 1.",
+    },
 }
 
 
