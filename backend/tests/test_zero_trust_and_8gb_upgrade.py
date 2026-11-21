@@ -200,6 +200,52 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
         )
         self.assertTrue(res_ok.passed)
 
+    def test_step_grader_lean_calc_and_implicit_conditions(self):
+        # 1. Dropped root diagnostic (`x*(x - 2) = 0` -> `x = 0` implicitly divides by x - 2 = 0)
+        dropped = grade_student_steps(
+            "Solve x*(x - 2) = 0",
+            ["x*(x - 2) = 0", "x = 0"],
+        )
+        self.assertFalse(dropped.overall_correct)
+        self.assertEqual(dropped.step_results[1].error_type, "dropped_root_error")
+        self.assertIn("x ≠ 2", dropped.implicit_conditions)
+
+        # 2. Extraneous root diagnostic (`x = 2` -> `x^2 = 4`)
+        extra = grade_student_steps(
+            "Solve x = 2",
+            ["x = 2", "x^2 = 4"],
+        )
+        self.assertFalse(extra.overall_correct)
+        self.assertEqual(extra.step_results[1].error_type, "extraneous_root_error")
+
+        # 3. Rational denominator pole diagnostic (`(x^2 - 4)/(x - 2)` -> `x + 2` assumes `x ≠ 2`)
+        rat = grade_student_steps(
+            "Simplify (x^2 - 4)/(x - 2)",
+            ["(x^2 - 4)/(x - 2)", "x + 2"],
+            operation="algebra",
+        )
+        self.assertTrue(rat.overall_correct)
+        self.assertIn("x ≠ 2", rat.implicit_conditions)
+        self.assertIsNotNone(rat.lean_certificate)
+        self.assertIn("field_simp", rat.lean_certificate)
+
+        # 4. Algebra calc certificate + /grade-steps lean_certify=True
+        with TestClient(app) as client:
+            r = client.post(
+                "/grade-steps",
+                json={
+                    "problem": "Expand (x + 2)*(x - 3)",
+                    "student_steps": ["(x + 2)*(x - 3)", "x^2 - 3*x + 2*x - 6", "x^2 - x - 6"],
+                    "operation": "algebra",
+                    "lean_certify": True,
+                },
+            )
+            self.assertEqual(r.status_code, 200)
+            data = r.json()
+            self.assertTrue(data["overall_correct"])
+            self.assertTrue(data["lean_verified"])
+            self.assertIn("calc", data["lean_certificate"])
+
 
 if __name__ == "__main__":
     unittest.main()

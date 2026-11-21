@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, AlertTriangle, ListChecks, Loader2, Sparkles } from 'lucide-react';
+import {
+  CheckCircle2,
+  AlertTriangle,
+  ListChecks,
+  Loader2,
+  Sparkles,
+  ShieldCheck,
+  Terminal,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 
 const PRESETS = [
   {
     label: 'Valid Derivative',
     operation: 'derivative',
     problem: 'Find the derivative of f(x) = x^3 + 2*x',
-    steps: 'd/dx(x^3 + 2*x)\n3*x^2 + 2',
+    steps: 'x^3 + 2*x\n3*x^2 + 2',
   },
   {
     label: 'Catch Sign Error',
@@ -15,10 +25,16 @@ const PRESETS = [
     steps: '2*x - 6 = 4\n2*x = -2\nx = -1',
   },
   {
-    label: 'Algebra Expansion',
+    label: 'Dropped Root Fallacy',
+    operation: 'equation',
+    problem: 'Solve x*(x - 2) = 0',
+    steps: 'x*(x - 2) = 0\nx = 0',
+  },
+  {
+    label: 'Rational Condition',
     operation: 'algebra',
-    problem: 'Expand (x + 2)*(x - 3)',
-    steps: '(x + 2)*(x - 3)\nx^2 - 3*x + 2*x - 6\nx^2 - x - 6',
+    problem: 'Simplify (x^2 - 4)/(x - 2)',
+    steps: '(x^2 - 4)/(x - 2)\nx + 2',
   },
 ];
 
@@ -26,6 +42,8 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
   const [problem, setProblem] = useState(initialProblem);
   const [operation, setOperation] = useState('auto');
   const [stepsText, setStepsText] = useState('');
+  const [leanCertify, setLeanCertify] = useState(false);
+  const [showCert, setShowCert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [gradeResult, setGradeResult] = useState(null);
   const [error, setError] = useState(null);
@@ -57,6 +75,7 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
           problem: problem.trim(),
           student_steps: stepLines,
           operation,
+          lean_certify: leanCertify,
         }),
       });
 
@@ -91,7 +110,7 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
               <span>Check My Derivation Steps</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Enter your original problem and each intermediate step on its own line to pinpoint exact equivalence or sign errors.
+              Enter your original problem and each intermediate step on its own line to pinpoint sign errors, dropped roots, and implicit domain assumptions.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -155,7 +174,18 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={leanCertify}
+                onChange={(e) => setLeanCertify(e.target.checked)}
+                className="rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-emerald-500/50"
+              />
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Certify valid derivation in Lean 4 kernel</span>
+            </label>
+
             <button
               type="submit"
               disabled={isLoading || !problem.trim() || !stepsText.trim()}
@@ -199,9 +229,16 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
                 <AlertTriangle className="w-6 h-6 text-rose-400" />
               )}
               <div>
-                <h3 className="text-base font-bold text-slate-100">
-                  {gradeResult.overall_correct ? 'All Derivation Steps Verified' : 'Step Discrepancy Detected'}
-                </h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-base font-bold text-slate-100">
+                    {gradeResult.overall_correct ? 'All Derivation Steps Verified' : 'Step Discrepancy Detected'}
+                  </h3>
+                  {gradeResult.lean_verified && (
+                    <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full font-mono">
+                      Lean 4 Calc-Certified
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-400">{gradeResult.summary}</p>
               </div>
             </div>
@@ -209,6 +246,18 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
               mode: {gradeResult.operation}
             </span>
           </div>
+
+          {Array.isArray(gradeResult.implicit_conditions) && gradeResult.implicit_conditions.length > 0 && (
+            <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-200 flex flex-wrap items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="font-semibold">Implicit Domain Conditions:</span>
+              {gradeResult.implicit_conditions.map((cond, i) => (
+                <span key={i} className="font-mono px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">
+                  {cond}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="space-y-2.5">
             {(gradeResult.step_results || []).map((step) => (
@@ -235,14 +284,40 @@ export default function StepGraderPanel({ apiBaseUrl, initialProblem = '' }) {
                     <p className="text-xs text-slate-400 mt-1">{step.feedback}</p>
                   </div>
                 </div>
-                {step.error_type && (
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0">
-                    {step.error_type}
-                  </span>
-                )}
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  {step.error_type && (
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                      {step.error_type}
+                    </span>
+                  )}
+                  {step.implicit_condition && (
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      cond: {step.implicit_condition}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+
+          {gradeResult.lean_certificate && (
+            <div className="pt-2 border-t border-slate-800/70">
+              <button
+                type="button"
+                onClick={() => setShowCert(!showCert)}
+                className="text-xs font-mono text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-colors"
+              >
+                {showCert ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{showCert ? 'Hide Lean 4 Derivation Certificate' : 'Show Lean 4 Derivation Certificate'}</span>
+              </button>
+              {showCert && (
+                <pre className="mt-2 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-200 overflow-x-auto whitespace-pre-wrap">
+                  {gradeResult.lean_certificate}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

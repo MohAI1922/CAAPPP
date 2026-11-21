@@ -614,3 +614,17 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true proofs verified + **11/11** false claims refuted with **Lean-verified counterexamples** (`399.677s — OK`).
   - Full SymPy dev-mode regression suite: **268 / 268 passing (100.0%)** in `15.339s`.
+
+---
+
+## Phase 24: Lean 4 `calc`-Trace Step Grader with Implicit-Condition Diagnostics (Completed 2026-11-21)
+
+- **Contribution #3 — Lean-Backed Step Grader & Implicit-Condition Engine (`backend/pipeline/step_grader.py`, `backend/main.py`)**:
+  - Upgraded [`grade_student_steps()`](file:///home/antigravity/MohAI1922/CAAPPP/backend/pipeline/step_grader.py) to diagnose **implicit division-by-zero / dropped roots** (`dropped_root_error`, e.g., losing `x = 2` in `x*(x - 2) = 0 → x = 0`), **extraneous roots** (`extraneous_root_error`, e.g., squaring equations), and **rational denominator poles** (`x ≠ 2` when simplifying `(x^2 - 4)/(x - 2) → x + 2`).
+  - Added [`synthesize_steps_lean_certificate()`](file:///home/antigravity/MohAI1922/CAAPPP/backend/pipeline/step_grader.py) generating standalone Lean 4 `calc` chains (with `field_simp [hden]` side hypotheses when denominators cancel), derivative/antiderivative theorems, and `↔` equation equivalence proofs.
+  - Added optional `lean_certify: bool = False` on `POST /grade-steps` to execute live Lean 4.36.0 certification on valid student derivations (`lean_verified = True`).
+- **React Frontend (`frontend/src/components/StepGraderPanel.jsx`)**:
+  - Added **Dropped Root Fallacy** and **Rational Condition** preset buttons, a **Certify valid derivation in Lean 4 kernel** toggle, implicit domain condition warning pills, `Lean 4 Calc-Certified` badge, and collapsible Lean 4 derivation certificate viewer; rebuilt production bundle (`npm --prefix frontend run build`).
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 suite (`backend.tests.test_zero_trust_and_8gb_upgrade`): **15 / 15 passing** in `22.699s` (proving multi-step `calc` certificates inside Lean 4.36.0).
+  - Full SymPy dev-mode regression suite: **269 / 269 passing (100.0%)** in `15.830s`.

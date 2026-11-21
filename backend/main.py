@@ -1770,11 +1770,12 @@ class GradeStepsRequest(BaseModel):
     problem: str
     student_steps: List[str]
     operation: str = "auto"
+    lean_certify: bool = False
 
 
 @app.post("/grade-steps")
 async def grade_steps_endpoint(req: GradeStepsRequest):
-    """Grade and diagnose a student's own multi-step derivation."""
+    """Grade and diagnose a student's own multi-step derivation, optionally certifying in Lean 4."""
     from backend.pipeline.step_grader import grade_student_steps
 
     res = grade_student_steps(
@@ -1782,6 +1783,9 @@ async def grade_steps_endpoint(req: GradeStepsRequest):
         student_steps=req.student_steps,
         operation=req.operation,
     )
+    if req.lean_certify and res.overall_correct and res.lean_certificate:
+        lean_res = await verify_async(res.lean_certificate)
+        res.lean_verified = lean_res.verdict == LeanVerdict.VERIFIED
     return res.to_dict()
 
 
