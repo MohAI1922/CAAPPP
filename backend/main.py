@@ -1618,6 +1618,25 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
     )
 
 
+class GradeStepsRequest(BaseModel):
+    problem: str
+    student_steps: List[str]
+    operation: str = "auto"
+
+
+@app.post("/grade-steps")
+async def grade_steps_endpoint(req: GradeStepsRequest):
+    """Grade and diagnose a student's own multi-step derivation."""
+    from backend.pipeline.step_grader import grade_student_steps
+
+    res = grade_student_steps(
+        problem=req.problem,
+        student_steps=req.student_steps,
+        operation=req.operation,
+    )
+    return res.to_dict()
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Health check
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1628,8 +1647,16 @@ async def health():
     import shutil
 
     lean_installed = shutil.which("lean") is not None or shutil.which("lake") is not None
-    default_model = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models", "phi-3-mini-4k-instruct-q4.gguf"))
-    model_path = os.getenv("LLM_MODEL_PATH", default_model)
+    models_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
+    model_path = os.getenv("LLM_MODEL_PATH")
+    if not model_path:
+        candidates = [
+            os.path.join(models_dir, "qwen2_5_1_5b_verimath_pi4-q4_k_m.gguf"),
+            os.path.join(models_dir, "qwen2.5-3b-instruct-q4_k_m.gguf"),
+            os.path.join(models_dir, "qwen2.5-1.5b-instruct-q4_k_m.gguf"),
+            os.path.join(models_dir, "phi-3-mini-4k-instruct-q4.gguf"),
+        ]
+        model_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
     model_exists = os.path.exists(model_path)
 
     cache_count = len(demo_cache.list_all())
@@ -1637,7 +1664,9 @@ async def health():
     return {
         "status": "ok",
         "lean_installed": lean_installed,
+        "strict_lean_mode": os.getenv("VERIMATH_STRICT_LEAN", "false").lower() in ("1", "true", "yes"),
         "model_loaded": model_exists,
+        "target_hardware": "Raspberry Pi 4 (8 GB RAM)",
         "demo_cache_size": cache_count,
         "supported_templates": list(TEMPLATES.keys()),
     }

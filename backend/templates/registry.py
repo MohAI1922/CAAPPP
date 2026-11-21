@@ -4742,9 +4742,9 @@ TEMPLATE_LIST: list[Template] = [
             "implicit differentiation", "folium of descartes", "find dy/dx",
         ],
         lean_template=(
-            "example (x y a dy : ℝ) (h : 3 * x^2 + 3 * y^2 * dy - 3 * a * (y + x * dy) = 0) (hden : y^2 - a * x ≠ 0) : dy = (a * y - x^2) / (y^2 - a * x) := by sorry"
+            "example (x y a dy : ℝ) (h : 3 * x^2 + 3 * y^2 * dy - 3 * a * (y + x * dy) = 0) (hden : y^2 - a * x ≠ 0) : dy = (a * y - x^2) / (y^2 - a * x) := by\n  field_simp [hden]\n  linarith"
         ),
-        tactic="sorry",
+        tactic="field_simp+linarith",
         prompt_hint="Calculus: Finds implicit derivative dy/dx with respect to x for a curve relating x and y.",
         slots=["expr", "var_x", "var_y", "dy_dx_exact", "dy_dx_disp"],
         back_translation_template=(

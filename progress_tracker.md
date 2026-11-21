@@ -469,3 +469,41 @@ timeline
     - `Find the derivative of x² sin(x) with respect to x` $\to$ Returns clean LaTeX $x^2 \cos(x) + 2x \sin(x)$ and 4 authentic El-Moasser Product Rule steps with zero `Real.` leaks and zero `\text{...}` KaTeX errors.
 - **Verification**:
   - Full test suite: **250 / 250 passing (100.0%) in 21.8s** with 0 regressions.
+
+---
+
+## Phase 15: Edge Deployment Alignment, Colab Pipeline Fixes & Verification (Completed 2026-11-21)
+
+- **Dependency & Environment Reproducibility**:
+  - Added `sympy>=1.12` to `requirements.txt` so clean Python environments and Raspberry Pi deployments install all required CAS dependencies.
+- **Colab Fine-Tuning Pipeline Alignment**:
+  - Fixed `scripts/VeriMath_Colab_FineTuning.ipynb` so Step 2 no longer overwrites the 9,888-entry `verimath_finetune_dataset.jsonl` with the legacy 3,195-entry generator, added GitHub auto-clone fallback in Step 4, and aligned hyperparameters (`lora_alpha=32`, `num_train_epochs=2`, `lr_scheduler_type="cosine"`).
+  - Aligned `scripts/train_on_colab.py` with the same hyperparameters and Qwen2.5-1.5B GGUF export target.
+- **Edge Configuration & Model Standardization**:
+  - Updated `.env.example`, `deployment/install_pi.sh`, `scripts/download_model.py`, and `backend/pipeline/solver.py` to standardize on `Qwen2.5-1.5B-Instruct` Q4_K_M GGUF (`LLM_N_CTX=2048`) with optional `--phi3` legacy fallback.
+- **IoT / MQTT Client Modernization**:
+  - Updated `backend/iot/mqtt_publisher.py` to use `paho-mqtt` `CallbackAPIVersion.VERSION2`, eliminating deprecation warnings.
+- **Frontend Build & Edge Benchmark**:
+  - Verified React production build (`frontend/build`, 132.97 kB JS + 9.45 kB CSS) and FastAPI `/health` & `/app/` serving (`HTTP 200`).
+  - Added `scripts/benchmark_edge.py`: verified `demo_cache.db` average lookup latency at **0.375 ms** (well under the 4.0 ms SLA) with **0** student-facing leaks.
+- **Verification**:
+  - Full test suite: **250 / 250 passing (100.0%)** with 0 regressions.
+
+---
+
+## Phase 16: Zero-Trust Hardening, 244/244 Dataset Remediation, Semantic Judge & 8 GB Pi 4 Upgrade (Completed 2026-11-21)
+
+- **Zero-Trust Lean 4 Hardening (`backend/pipeline/lean_runner.py`, `backend/templates/registry.py`)**:
+  - Replaced `:= by sorry` in `implicit_derivative` template with `field_simp [hden]; linarith`.
+  - Blocked `sorry`, `admit`, and custom `axiom` in `verify_async()`, caught `uses 'sorry'` in `_has_lean_errors()`, and added `VERIMATH_STRICT_LEAN=true` fail-closed mode.
+- **Dataset Remediation & 100% Template Coverage (`scripts/remediate_dataset.py`, `verimath_finetune_dataset.jsonl`)**:
+  - Eliminated all **429** `sorry` placeholders and fixed **143** corrupted `implicit_derivative` labels via exact SymPy differentiation.
+  - Added **423** verified ChatML examples across all **141** previously missing templates -> **10,311** total entries, **244/244 (100%)** template coverage, **0** `sorry`.
+- **Semantic Inversion Guard (`backend/pipeline/statement_judge.py`)**:
+  - Added `_check_semantic_inversions()` catching flipped inequalities (`<` vs `>`), swapped derivative targets (`dy/dx` vs `dx/dy`), swapped variable bindings (`x=a, y=b` vs `x=b, y=a`), and equation sign inversions.
+- **Student Multi-Step Derivation Grader (`backend/pipeline/step_grader.py`, `backend/main.py`)**:
+  - Added `grade_student_steps()` and `POST /grade-steps` to verify student algebra, equation solving, derivative, and integral steps and pinpoint errors (`sign_error`, `constant_error`, `factor_error`, `algebra_mismatch`).
+- **8 GB Raspberry Pi 4 Hardware Alignment**:
+  - Raised default `LLM_N_CTX` to `4096`, added `Qwen2.5-3B-Instruct` Q4_K_M support (`scripts/download_model.py --3b`, `solver.py`, `/health`), and updated `VeriMath_Colab_FineTuning.ipynb`.
+- **Verification**:
+  - Full test suite: **261 / 261 passing (100.0%)** with 0 regressions.

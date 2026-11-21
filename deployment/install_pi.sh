@@ -7,7 +7,7 @@
 #   2. Lean 4 (elan version manager)
 #   3. Python 3.11 virtual environment & dependencies
 #   4. llama.cpp / llama-cpp-python
-#   5. Model download (Phi-3 Mini GGUF Q4)
+#   5. Model download (Qwen2.5-1.5B Q4_K_M GGUF)
 #   6. Mosquitto MQTT broker configuration
 #   7. React frontend build
 #   8. Systemd service registration & enablement
@@ -53,9 +53,9 @@ source .venv/bin/activate
 pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 
-# Step 5: Download Phi-3 Mini Model
+# Step 5: Download Qwen2.5-1.5B Model
 echo ""
-echo "[5/8] Downloading local model (Phi-3 Mini GGUF)..."
+echo "[5/8] Downloading local model (Qwen2.5-1.5B Q4_K_M GGUF)..."
 python3 scripts/download_model.py
 
 # Step 6: Frontend Build

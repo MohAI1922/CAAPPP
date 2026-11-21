@@ -102,6 +102,16 @@ async def verify_async(lean_statement: str, timeout_seconds: int = LEAN_TIMEOUT)
     Returns:
         LeanResult with verdict and raw output.
     """
+    # Zero-Trust Guardrail: never allow 'sorry', 'admit', or custom 'axiom'
+    if re.search(r"\b(sorry|admit|axiom)\b", lean_statement):
+        logger.warning("❌ Zero-trust rejection: statement contains forbidden 'sorry', 'admit', or 'axiom'.")
+        return LeanResult(
+            verdict=LeanVerdict.REJECTED,
+            lean_output="Zero-trust policy: unproven 'sorry', 'admit', or custom 'axiom' is forbidden.",
+            elapsed_ms=0,
+            lean_file="",
+        )
+
     # Write the temp Lean file
     lean_file = VERIFY_TMPDIR / f"stmt_{time.monotonic_ns()}.lean"
     lean_content = _LEAN_FILE_HEADER + lean_statement + "\n"
@@ -145,6 +155,14 @@ async def verify_async(lean_statement: str, timeout_seconds: int = LEAN_TIMEOUT)
                 lean_file=str(lean_file),
             )
         elif code == "NOT_FOUND":
+            if os.getenv("VERIMATH_STRICT_LEAN", "false").lower() in ("1", "true", "yes"):
+                logger.error("❌ VERIMATH_STRICT_LEAN is enabled and Lean binary was not found.")
+                return LeanResult(
+                    verdict=LeanVerdict.ENGINE_ERROR,
+                    lean_output=combined_output,
+                    elapsed_ms=elapsed_ms,
+                    lean_file=str(lean_file),
+                )
             logger.info("Lean binary not found. Using SymPy CAS verification fallback (Dev Mode; Lean 4 active on Pi)...")
             sympy_ok = _verify_with_sympy(lean_statement)
             if sympy_ok:
@@ -252,7 +270,7 @@ def _parse_lean_output(
 
 
 def _has_lean_errors(output: str) -> bool:
-    """Check if Lean output contains error markers."""
+    """Check if Lean output contains error markers or unproven sorry warnings."""
     error_patterns = [
         r"\berror\b",
         r"unsolved goals",
@@ -260,6 +278,8 @@ def _has_lean_errors(output: str) -> bool:
         r"unknown identifier",
         r"failed to synthesize",
         r"application type mismatch",
+        r"uses 'sorry'",
+        r"\bsorry\b",
     ]
     output_lower = output.lower()
     return any(re.search(p, output_lower) for p in error_patterns)
@@ -348,7 +368,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
         if ("hdydx" in stmt or "hden" in stmt) and "hcurve" in stmt:
             return True
 
-        if "↔" in stmt and ("x -" in stmt or "x0" in stmt or "slope" in stmt or "x =" in stmt or "y -" in stmt):
+        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or ("y" in stmt and ("x -" in stmt or "x =" in stmt))):
             m_tan = re.search(r":\s*\((.+?)\)\s*↔\s*\((.+?)\)\s*:= by", stmt)
             if m_tan:
                 eq1, eq2 = m_tan.groups()
@@ -456,7 +476,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                 return bool(sympy.simplify(calc_slope - ans_v) == 0)
 
         # ── Implicit tangent line equivalence ────────────────────────────────
-        if "↔" in stmt and ("x -" in stmt or "x0" in stmt or "slope" in stmt or "x =" in stmt or "y -" in stmt):
+        if "↔" in stmt and "by omega" not in stmt and ("y -" in stmt or "slope" in stmt or "x0" in stmt or ("y" in stmt and ("x -" in stmt or "x =" in stmt))):
             m_tan = re.search(r"\((.+?)\)\s*↔\s*\((.+?)\)\s*:= by", stmt)
             if m_tan:
                 eq1, eq2 = m_tan.groups()
