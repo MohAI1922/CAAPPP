@@ -158,6 +158,9 @@ class SolveResponse(BaseModel):
     elapsed_ms: int = 0
     from_cache: bool = False
     generalized_mode: bool = False
+    counterexample: Optional[Dict[str, Any]] = None
+    ast_verified: bool = True
+    ast_checks: Optional[List[str]] = None
 
 
 def _clean_lean_syntax(s: Optional[str]) -> Optional[str]:
@@ -1461,12 +1464,15 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
     template_id = classify_problem(problem)
 
     if template_id is None:
-        # Novel Out-of-Domain Generalized Propose → Formalize → Lean Verify / Reject
+        # Novel Out-of-Domain Generalized Propose → AST Anti-Cheating Audit → Lean Verify / Disprove
         from backend.pipeline.generalized_prover import propose_generalized
         from backend.pipeline.statement_judge import _check_numbers_match, _check_semantic_inversions
+        from backend.pipeline.ast_faithfulness import verify_ast_faithfulness
+        from backend.pipeline.counterexample import synthesize_counterexample_proposal
 
         retry_fb: Optional[str] = None
         last_reason = "Could not formally verify a generalized solution for this out-of-domain problem."
+        last_lean_stmt: Optional[str] = None
 
         for attempt in range(1, MAX_RETRIES + 1):
             proposal = propose_generalized(problem, feedback=retry_fb)
@@ -1485,10 +1491,18 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
                 last_reason = proposal.reasoning or last_reason
                 break
 
+            last_lean_stmt = proposal.lean_statement
+
             num_chk = _check_numbers_match(problem, proposal.back_translation)
             inv_chk = _check_semantic_inversions(problem, proposal.back_translation)
-            if not num_chk.passed or not inv_chk.passed:
-                last_reason = num_chk.reason or inv_chk.reason or "Faithfulness mismatch on generalized proposal."
+            ast_chk = verify_ast_faithfulness(problem, proposal.lean_statement, subkind=proposal.subkind)
+            if not num_chk.passed or not inv_chk.passed or not ast_chk.passed:
+                last_reason = (
+                    ast_chk.reason
+                    or num_chk.reason
+                    or inv_chk.reason
+                    or "Faithfulness mismatch on generalized proposal."
+                )
                 retry_fb = last_reason
                 continue
 
@@ -1543,6 +1557,8 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
                     template_id=proposal.subkind,
                     elapsed_ms=elapsed_ms,
                     generalized_mode=True,
+                    ast_verified=True,
+                    ast_checks=ast_chk.checks_run,
                 )
             else:
                 last_reason = (
@@ -1550,6 +1566,23 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
                     f"{lean_res.lean_output[:200]}"
                 )
                 retry_fb = last_reason
+
+        # Attempt Lean-certified counterexample synthesis when a false claim is rejected
+        ce_dict: Optional[Dict[str, Any]] = None
+        ce_prop = synthesize_counterexample_proposal(problem, last_lean_stmt)
+        if ce_prop and ce_prop.found and ce_prop.disproof_lean_statement:
+            ce_lean = await verify_async(ce_prop.disproof_lean_statement)
+            logger.info(
+                f"Counterexample Lean disproof verification: {ce_lean.verdict} in {ce_lean.elapsed_ms}ms "
+                f"(witness={ce_prop.witness_display})"
+            )
+            if ce_lean.verdict == LeanVerdict.VERIFIED:
+                ce_prop.lean_verified = True
+                ce_dict = ce_prop.to_dict()
+                last_reason = (
+                    f"Mathematically Disproven (Counterexample verified in Lean 4 at "
+                    f"{ce_prop.witness_display}): {ce_prop.explanation}"
+                )
 
         # Strictly reject false or unverified out-of-domain proposals
         elapsed_ms = int((time.monotonic() - pipeline_start) * 1000)
@@ -1566,6 +1599,7 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
             template_id="generalized_rejected",
             elapsed_ms=elapsed_ms,
             generalized_mode=True,
+            counterexample=ce_dict,
         )
 
     logger.info(f"Problem classified as: '{template_id}'")

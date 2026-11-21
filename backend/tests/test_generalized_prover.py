@@ -64,6 +64,7 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
                 data = r.json()
                 self.assertEqual(data["status"], "VERIFIED", f"Expected VERIFIED for '{prob}', got {data}")
                 self.assertTrue(data["generalized_mode"])
+                self.assertTrue(data.get("ast_verified", False))
                 self.assertEqual(data["template_id"], expected_kind)
                 self.assertTrue(data["explanation"])
                 self.assertTrue(data["mental_model"])
@@ -88,6 +89,12 @@ class TestGeneralizedOutOfDomainProver(unittest.TestCase):
                 self.assertEqual(data["status"], "REJECTED", f"False claim '{claim}' was not REJECTED: {data}")
                 self.assertTrue(data["generalized_mode"])
                 self.assertIsNone(data["verified_answer"])
+                ce = data.get("counterexample")
+                self.assertIsNotNone(ce, f"Expected synthesized counterexample for '{claim}'")
+                self.assertTrue(ce["found"], f"Counterexample not found for '{claim}'")
+                self.assertTrue(ce["lean_verified"], f"Counterexample not Lean-verified for '{claim}': {ce}")
+                self.assertTrue(ce["witness_display"])
+                self.assertTrue(ce["disproof_lean_statement"])
 
     def test_non_math_prompt_returns_unsupported(self):
         with TestClient(app) as client:

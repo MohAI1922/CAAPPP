@@ -164,6 +164,35 @@ class TestZeroTrustAnd8GBUpgrade(unittest.TestCase):
             for tok in forbidden_tokens:
                 self.assertNotIn(tok, blob, f"Rule 22/23 violation '{tok}' in guide '{key}'")
 
+    def test_ast_faithfulness_anti_cheating_guards(self):
+        from backend.pipeline.ast_faithfulness import verify_ast_faithfulness
+
+        # 1. Tautology substitution (`1 + 1 = 2` for an algebra problem)
+        res_taut = verify_ast_faithfulness("Solve 3x + 7 = 22", "example : 1 + 1 = 2 := by norm_num")
+        self.assertFalse(res_taut.passed)
+
+        # 2. Reflexive tautology (`x = x` on an identity proof)
+        res_refl = verify_ast_faithfulness("Prove that (a + b)^2 = a^2 + b^2", "example (x : ℝ) : x = x := by rfl")
+        self.assertFalse(res_refl.passed)
+
+        # 3. Inequality weakening (`>` replaced with `≥`)
+        res_weak = verify_ast_faithfulness("Prove that x^2 + 1 > 0", "example (x : ℝ) : x^2 + 1 ≥ 0 := by positivity")
+        self.assertFalse(res_weak.passed)
+
+        # 4. RHS tampering on a false claim (`a^2 + b^2` silently replaced by `a^2 + 2*a*b + b^2`)
+        res_tamper = verify_ast_faithfulness(
+            "Prove that (a + b)^2 = a^2 + b^2",
+            "example (a b : ℝ) : (a + b)^2 = a^2 + 2*a*b + b^2 := by ring",
+        )
+        self.assertFalse(res_tamper.passed)
+
+        # 5. Legitimate faithful identity passes
+        res_ok = verify_ast_faithfulness(
+            "Prove that (a + b)^2 = a^2 + 2*a*b + b^2",
+            "example (a b : ℝ) : (a + b)^2 = a^2 + 2*a*b + b^2 := by ring",
+        )
+        self.assertTrue(res_ok.passed)
+
 
 if __name__ == "__main__":
     unittest.main()

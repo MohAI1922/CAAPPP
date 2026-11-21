@@ -305,6 +305,11 @@ export default function ResultPanel({ result }) {
               <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full font-mono">
                 Lean 4 Verified
               </span>
+              {result.ast_verified !== false && (
+                <span className="text-xs font-semibold px-2 py-0.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 rounded-full font-mono">
+                  AST Faithfulness Verified
+                </span>
+              )}
               {result.generalized_mode && (
                 <span className="text-xs font-semibold px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-mono">
                   Generalized Out-of-Domain Proof

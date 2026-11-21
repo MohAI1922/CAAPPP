@@ -451,7 +451,7 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             return all_ok
 
         # ── Primality ────────────────────────────────────────────────────────
-        m = re.search(r"Nat\.Prime\s+(\d+)\s*:= by", stmt)
+        m = None if "¬" in stmt else re.search(r"Nat\.Prime\s+(\d+)\s*:= by", stmt)
         if m:
             return isprime(int(m.group(1)))
 
@@ -898,18 +898,40 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             ok2 = bool(sympy.simplify(lhs.subs(x, r2) - rhs) == 0)
             return ok1 and ok2
 
-        # ── Quadratic with no real roots: lhs ≠ rhs ──────────────────────────
+        # ── Counterexample disproofs & no-real-root quadratics: lhs ≠ rhs ─────
         m_neq = re.search(r"(.+?)\s*≠\s*(.+)", eq_part)
         if m_neq:
-            lhs = sympify(_py_expr(m_neq.group(1)))
-            rhs = sympify(_py_expr(m_neq.group(2)))
-            diff_poly = sympy.Poly(lhs - rhs, x)
-            if diff_poly.degree() == 2:
-                a = diff_poly.coeff_monomial(x**2)
-                b = diff_poly.coeff_monomial(x**1)
-                c = diff_poly.coeff_monomial(x**0)
-                D = b**2 - 4*a*c
-                return bool(D < 0)
+            l_s = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", m_neq.group(1)).strip()
+            r_s = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", m_neq.group(2)).strip()
+            neq_locals = {
+                "sympy": sympy,
+                "sqrt": sympy.sqrt,
+                "I": sympy.I,
+                "pi": sympy.pi,
+                "log": sympy.log,
+                "exp": sympy.exp,
+                "sin": sympy.sin,
+                "cos": sympy.cos,
+                "tan": sympy.tan,
+            }
+            lhs = sympify(_py_expr(l_s), locals=neq_locals)
+            rhs = sympify(_py_expr(r_s), locals=neq_locals)
+            diff_expr = sympy.simplify(sympy.expand(lhs - rhs))
+            if x in diff_expr.free_symbols:
+                diff_poly = sympy.Poly(lhs - rhs, x)
+                if diff_poly.degree() == 2:
+                    a = diff_poly.coeff_monomial(x**2)
+                    b = diff_poly.coeff_monomial(x**1)
+                    c = diff_poly.coeff_monomial(x**0)
+                    D = b**2 - 4*a*c
+                    return bool(D < 0)
+            if not diff_expr.free_symbols:
+                if diff_expr == 0:
+                    return False
+                try:
+                    return bool(abs(complex(diff_expr.evalf())) > 1e-9)
+                except Exception:
+                    return bool(diff_expr != 0)
 
         # ── Linear / Exponential equation solving: (lhs = rhs) ↔ (var = ans) ──
         eq_clean_iff = re.sub(r"\s*:\s*(?:ℝ|Real|R|ℕ|Nat|ℂ|Complex)(?=\))", "", eq_part).strip()
@@ -983,10 +1005,10 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             if all_ok:
                 return True
 
-        # ── Generalized Negation ¬ (P) ────────────────────────────────────────
-        m_neg = re.match(r"^¬\s*\((.+)\)$", eq_part.strip())
+        # ── Generalized Negation ¬ P / ¬ (P) ──────────────────────────────────
+        m_neg = re.match(r"^¬\s*(?:\((.+)\)|(.+))$", eq_part.strip())
         if m_neg:
-            inner = m_neg.group(1).strip()
+            inner = (m_neg.group(1) or m_neg.group(2)).strip()
             return not _verify_with_sympy(f"example : {inner} := by norm_num")
 
         # ── Generalized Divisibility: (a : ℕ) ∣ b ─────────────────────────────

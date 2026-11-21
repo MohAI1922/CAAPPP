@@ -130,11 +130,13 @@ def judge(
         f"(threshold: {MATCH_THRESHOLD})"
     )
 
-    # Step 4: Additional checks: numbers, mathematical functions, physical entities, and semantic inversions
+    # Step 4: Additional checks: numbers, mathematical functions, physical entities, semantic inversions, and AST faithfulness
+    from backend.pipeline.ast_faithfulness import verify_ast_faithfulness
     numeric_check = _check_numbers_match(problem, back_translation)
     function_check = _check_math_functions_match(problem, back_translation)
     entity_check = _check_key_entities_match(problem, back_translation)
     inversion_check = _check_semantic_inversions(problem, back_translation, slot_values)
+    ast_check = verify_ast_faithfulness(problem, formalizer_result.lean_statement)
 
     # Step 5: Verdict
     if (
@@ -143,6 +145,7 @@ def judge(
         and function_check.passed
         and entity_check.passed
         and inversion_check.passed
+        and ast_check.passed
     ):
         return JudgeResult(
             verdict="MATCH",
@@ -163,6 +166,8 @@ def judge(
             reason_parts.append(entity_check.reason)
         if not inversion_check.passed:
             reason_parts.append(inversion_check.reason)
+        if not ast_check.passed and ast_check.reason:
+            reason_parts.append(ast_check.reason)
 
         return JudgeResult(
             verdict="MISMATCH",

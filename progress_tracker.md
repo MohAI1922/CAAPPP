@@ -598,3 +598,19 @@ timeline
 - **Verification**:
   - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true out-of-domain proofs verified + **8/8** false claims strictly rejected (`295.560s — OK`).
   - Full SymPy dev-mode regression suite: **267 / 267 passing (100.0%)** in `13.962s`.
+
+---
+
+## Phase 23: Lean-Certified Counterexample Synthesis & Structural AST Anti-Cheating Verifier (Completed 2026-11-21)
+
+- **Contribution #1 — Lean-Certified Counterexample Synthesis (`backend/pipeline/counterexample.py`, `backend/main.py`, `frontend/src/components/RejectionPanel.jsx`)**:
+  - When an out-of-domain false claim fails Lean verification, `synthesize_counterexample_proposal()` constructs a minimal human witness (e.g., `a = 1, b = 1` for `(a+b)^2 = a^2+b^2`, `x = 0` for `sin^2 x + cos^2 x = 2`, `(2, 3)` via `Real.exp_add`/`Real.exp_log` injectivity for `log(a+b) = log(a)+log(b)`, `Complex.re`/`Complex.im` projections for complex claims, `91 = 7 × 13` for `Nat.Prime 91`, remainder witness for `∣`, numeric/symbolic witness for inequalities) and verifies the standalone negation theorem inside Lean 4.36.0 (`counterexample.lean_verified = True`).
+  - Updated `RejectionPanel.jsx` to display a **Mathematically Disproven (Lean 4 Counterexample)** banner, evaluated LHS vs. claimed RHS cards, intuitive explanation, and collapsible Lean 4 counterexample proof.
+- **Contribution #2 — Structural AST Anti-Cheating Verifier (`backend/pipeline/ast_faithfulness.py`, `backend/pipeline/statement_judge.py`, `backend/main.py`, `frontend/src/components/ResultPanel.jsx`)**:
+  - Implemented `verify_ast_faithfulness()` parsing both user problem expressions and Lean 4 theorem signatures into canonical SymPy trees to block trivial tautology substitution (`1 + 1 = 2`, `x = x`), strict inequality weakening (`>` → `≥` or `=`), RHS tampering (`(a+b)^2 = a^2 + b^2` altered to `a^2 + 2ab + b^2`), derivative target erasure, and dropped transcendental functions.
+  - Integrated directly into both `statement_judge.judge()` and the generalized pipeline; surfaced `ast_verified` badge (`AST Faithfulness Verified`) in `ResultPanel.jsx`.
+- **SymPy Dev-Mode Parity & UI Build (`backend/pipeline/lean_runner.py`)**:
+  - Added general `≠` counterexample disproof evaluation and fixed `¬ Nat.Prime` / unparenthesized `¬ P` negation handling in `_verify_with_sympy`; rebuilt frontend (`npm --prefix frontend run build`).
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`backend.tests.test_generalized_prover`): **29/29** true proofs verified + **8/8** false claims refuted with **Lean-verified counterexamples** (`336.238s — OK`).
+  - Full SymPy dev-mode regression suite: **268 / 268 passing (100.0%)** in `14.640s`.
