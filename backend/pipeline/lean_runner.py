@@ -770,12 +770,12 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             d2_claimed = sympify(_py_expr(m_infl.group(2)), locals=loc)
             return bool(sympy.simplify(diff(diff(f, x), x) - d2_claimed) == 0)
 
-        # ── Derivative / Indefinite Integral ──────────────────────────────────
-        m = re.search(r"deriv\s*\(\s*fun\s+([xt])\s*=>\s*(.+?)\s*\)\s*\1\s*=\s*(.+?)\s*:= by", stmt)
+        # ── Derivative / Partial Derivative / Indefinite Integral ───────────────
+        m = re.search(r"deriv\s*\(\s*fun\s+([xyzat])\s*=>\s*(.+?)\s*\)\s*\1\s*=\s*(.+?)\s*:= by", stmt)
         if m:
             var_sym = sympy.Symbol(m.group(1))
             loc = {
-                "sympy": sympy, "x": x, "t": symbols("t"),
+                "sympy": sympy, "x": x, "y": symbols("y"), "z": symbols("z"), "t": symbols("t"),
                 "pi": sympy.pi, "sqrt": sympy.sqrt,
                 "sin": sympy.sin, "cos": sympy.cos, "tan": sympy.tan,
                 "sec": sympy.sec, "csc": sympy.csc, "cot": sympy.cot,
@@ -785,7 +785,12 @@ def _verify_with_sympy(lean_statement: str) -> bool:
             f = sympify(_py_expr(m.group(2)), locals=loc)
             d_claimed = sympify(_py_expr(m.group(3)), locals=loc)
             diff_f = diff(f, var_sym)
-            # Fast numerical check first to prevent hanging on massive algebraic/Cardano expressions
+            try:
+                if sympy.simplify(diff_f - d_claimed) == 0:
+                    return True
+            except Exception:
+                pass
+            # Fast numerical check for univariate expressions
             verified_pts = 0
             mismatch = False
             for test_pt in [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5]:
@@ -804,12 +809,6 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                 return False
             if verified_pts >= 2:
                 return True
-
-            try:
-                if sympy.simplify(diff_f - d_claimed) == 0:
-                    return True
-            except Exception:
-                pass
             return False
 
         # ── Definite integral / King's rule ──────────────────────────────────
@@ -922,6 +921,57 @@ def _verify_with_sympy(lean_statement: str) -> bool:
                     break
             if all_ok:
                 return True
+
+        # ── Generalized Negation ¬ (P) ────────────────────────────────────────
+        m_neg = re.match(r"^¬\s*\((.+)\)$", eq_part.strip())
+        if m_neg:
+            inner = m_neg.group(1).strip()
+            return not _verify_with_sympy(f"example : {inner} := by norm_num")
+
+        # ── Generalized Divisibility: (a : ℕ) ∣ b ─────────────────────────────
+        m_div = re.match(r"^\(?(\d+)(?:\s*:\s*ℕ)?\)?\s*∣\s*\(?(\d+)(?:\s*:\s*ℕ)?\)?$", eq_part.strip())
+        if m_div:
+            a_i, b_i = int(m_div.group(1)), int(m_div.group(2))
+            return a_i != 0 and (b_i % a_i == 0)
+
+        # ── Generalized Modulo: (a : ℕ) % m = r ──────────────────────────────
+        m_mod = re.match(r"^\(?(\d+)(?:\s*:\s*ℕ)?\)?\s*%\s*(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_mod:
+            a_i, m_i, r_i = int(m_mod.group(1)), int(m_mod.group(2)), int(m_mod.group(3))
+            return m_i > 0 and (a_i % m_i == r_i)
+
+        # ── Generalized Nat.gcd / Nat.choose / Finset.Icc sum ─────────────────
+        m_gcd = re.match(r"^Nat\.gcd\s+(\d+)\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_gcd:
+            import math
+            return math.gcd(int(m_gcd.group(1)), int(m_gcd.group(2))) == int(m_gcd.group(3))
+
+        m_ch = re.match(r"^Nat\.choose\s+(\d+)\s+(\d+)\s*=\s*(\d+)$", eq_part.strip())
+        if m_ch:
+            import math
+            return math.comb(int(m_ch.group(1)), int(m_ch.group(2))) == int(m_ch.group(3))
+
+        m_fsum = re.match(r"^\(?\s*∑\s+k\s+∈\s+Finset\.Icc\s+(\d+)\s+(\d+),\s*k\s*\)?\s*=\s*(\d+)$", eq_part.strip())
+        if m_fsum:
+            lo, hi, tot = int(m_fsum.group(1)), int(m_fsum.group(2)), int(m_fsum.group(3))
+            return sum(range(lo, hi + 1)) == tot
+
+        # ── Generalized Inequalities (<, >, ≤, ≥) ─────────────────────────────
+        m_ineq = re.match(r"^(.+?)\s*(<=|>=|≤|≥|<|>)\s*(.+)$", eq_part.strip())
+        if m_ineq and "=" not in eq_part.replace("<=", "").replace(">=", ""):
+            l_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R|ℕ|Nat)\)", r"(\1)", m_ineq.group(1)).strip()
+            r_clean = re.sub(r"\((.+?)\s*:\s*(?:ℝ|Real|R|ℕ|Nat)\)", r"(\1)", m_ineq.group(3)).strip()
+            lv = sympify(_py_expr(l_clean), locals={"sympy": sympy, "sqrt": sympy.sqrt})
+            rv = sympify(_py_expr(r_clean), locals={"sympy": sympy, "sqrt": sympy.sqrt})
+            op = m_ineq.group(2)
+            if op == "<":
+                return bool(lv < rv)
+            if op == ">":
+                return bool(lv > rv)
+            if op in ("<=", "≤"):
+                return bool(lv <= rv)
+            if op in (">=", "≥"):
+                return bool(lv >= rv)
 
         # ── Generic equality: expr = answer (arithmetic / algebraic) ─────────
         if "=" in eq_part:

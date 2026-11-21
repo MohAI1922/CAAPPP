@@ -7536,6 +7536,17 @@ def classify_problem(problem: str) -> Optional[str]:
     if any(u in problem_lower for u in UNSUPPORTED_DOMAINS):
         return None
 
+    # Out-of-domain generalized claims (routed to generalized_prover.py)
+    if (
+        "partial derivative" in problem_lower
+        or "∂" in problem_clean
+        or "dot product" in problem_lower
+        or re.search(r"\bgcd\s*\(|\blcm\s*\(|\bchoose\s*\(", problem_lower)
+        or re.search(r"\bdoes\s+\d+\s+divide\b|\bdivisible\s+by\b|\bmodulo\b|\bsum\s+of\s+(?:the\s+)?first\s+\d+", problem_lower)
+        or re.match(r"^\s*(?:prove|show|verify)\s+(?:that\s+)?", problem_lower)
+    ):
+        return None
+
     # King's Rule / Property of Definite Integrals
     if any(w in problem_lower for w in ["king's rule", "king rule", "king's property", "king property", "by king rule"]):
         return "kings_rule_integral"

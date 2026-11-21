@@ -157,6 +157,7 @@ class SolveResponse(BaseModel):
     template_id: Optional[str] = None
     elapsed_ms: int = 0
     from_cache: bool = False
+    generalized_mode: bool = False
 
 
 def _clean_lean_syntax(s: Optional[str]) -> Optional[str]:
@@ -1460,19 +1461,111 @@ async def solve_endpoint(req: SolveRequest) -> SolveResponse:
     template_id = classify_problem(problem)
 
     if template_id is None:
+        # Novel Out-of-Domain Generalized Propose → Formalize → Lean Verify / Reject
+        from backend.pipeline.generalized_prover import propose_generalized
+        from backend.pipeline.statement_judge import _check_numbers_match, _check_semantic_inversions
+
+        retry_fb: Optional[str] = None
+        last_reason = "Could not formally verify a generalized solution for this out-of-domain problem."
+
+        for attempt in range(1, MAX_RETRIES + 1):
+            proposal = propose_generalized(problem, feedback=retry_fb)
+            if not proposal.is_math_problem:
+                elapsed_ms = int((time.monotonic() - pipeline_start) * 1000)
+                _publish_event(problem=problem, verdict="UNSUPPORTED", elapsed_ms=elapsed_ms, student_id=req.student_id)
+                return SolveResponse(
+                    status="UNSUPPORTED",
+                    rejection_reason=(
+                        "This prompt does not appear to be a verifiable mathematical problem."
+                    ),
+                    elapsed_ms=elapsed_ms,
+                )
+
+            if not proposal.lean_statement:
+                last_reason = proposal.reasoning or last_reason
+                break
+
+            num_chk = _check_numbers_match(problem, proposal.back_translation)
+            inv_chk = _check_semantic_inversions(problem, proposal.back_translation)
+            if not num_chk.passed or not inv_chk.passed:
+                last_reason = num_chk.reason or inv_chk.reason or "Faithfulness mismatch on generalized proposal."
+                retry_fb = last_reason
+                continue
+
+            lean_res = await verify_async(proposal.lean_statement)
+            logger.info(
+                f"Generalized Lean [{attempt}] ({proposal.subkind}): "
+                f"{lean_res.verdict} in {lean_res.elapsed_ms}ms"
+            )
+
+            if lean_res.verdict == LeanVerdict.VERIFIED:
+                elapsed_ms = int((time.monotonic() - pipeline_start) * 1000)
+                guide = build_intuitive_guide(
+                    problem=problem,
+                    verified_answer=proposal.candidate_answer,
+                    reasoning=proposal.reasoning,
+                    template_id=proposal.subkind,
+                )
+                explanation = explain(
+                    problem=problem,
+                    verified_answer=proposal.candidate_answer,
+                    reasoning=proposal.reasoning,
+                    template_id=proposal.subkind,
+                )
+                _publish_event(
+                    problem=problem,
+                    verdict="VERIFIED",
+                    elapsed_ms=elapsed_ms,
+                    template_id=proposal.subkind,
+                    candidate_answer=proposal.candidate_answer,
+                    lean_statement=proposal.lean_statement,
+                    judge_verdict="MATCH",
+                    retry_count=attempt - 1,
+                    student_id=req.student_id,
+                )
+                return SolveResponse(
+                    status="VERIFIED",
+                    verified_answer=_clean_lean_syntax(proposal.candidate_answer),
+                    latex_answer=to_latex(proposal.candidate_answer),
+                    lean_statement=proposal.lean_statement,
+                    back_translation=_clean_lean_syntax(proposal.back_translation),
+                    explanation=explanation,
+                    mental_model=guide.mental_model,
+                    pitfall_tip=guide.pitfall_tip,
+                    steps=[
+                        {
+                            "step_number": 1,
+                            "title": "Generalized Concept & Proposal",
+                            "explanation": guide.intuitive_body,
+                            "math": to_latex(proposal.candidate_answer),
+                        }
+                    ],
+                    template_id=proposal.subkind,
+                    elapsed_ms=elapsed_ms,
+                    generalized_mode=True,
+                )
+            else:
+                last_reason = (
+                    f"Generalized proposal '{proposal.candidate_answer}' was rejected by formal verification: "
+                    f"{lean_res.lean_output[:200]}"
+                )
+                retry_fb = last_reason
+
+        # Strictly reject false or unverified out-of-domain proposals
         elapsed_ms = int((time.monotonic() - pipeline_start) * 1000)
-        _publish_event(problem=problem, verdict="UNSUPPORTED", elapsed_ms=elapsed_ms, student_id=req.student_id)
-        return SolveResponse(
-            status="UNSUPPORTED",
-            rejection_reason=(
-                "This problem type is outside VeriMath's verified domain. "
-                "I cannot guarantee correctness, so I will not answer. "
-                "Supported types: arithmetic, algebra, equation solving, quadratic equations, "
-                "derivatives, definite/indefinite integrals, related rates, "
-                "applied optimization (area, volume, cost, profit, distance, geometric shapes), "
-                "primality, geometric distance."
-            ),
+        _publish_event(
+            problem=problem,
+            verdict="REJECTED",
             elapsed_ms=elapsed_ms,
+            template_id="generalized_rejected",
+            student_id=req.student_id,
+        )
+        return SolveResponse(
+            status="REJECTED",
+            rejection_reason=last_reason,
+            template_id="generalized_rejected",
+            elapsed_ms=elapsed_ms,
+            generalized_mode=True,
         )
 
     logger.info(f"Problem classified as: '{template_id}'")

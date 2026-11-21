@@ -536,3 +536,18 @@ timeline
   - Updated `ResultPanel.jsx` to display the problem-specific **Mental Model** banner and dynamic **Teacher's Pedagogical Tip & Common Pitfall**, rebuilt production bundle (`133.03 kB` JS).
 - **Verification**:
   - Full test suite: **262 / 262 passing (100.0%)** in `12.368s`.
+
+---
+
+## Phase 19: Novel Generalized Out-of-Domain Autoformalization & Prover (Completed 2026-11-21)
+
+- **Generalized Propose-Verify-or-Reject Layer (`backend/pipeline/generalized_prover.py`, `backend/main.py`)**:
+  - Activated **if and only if** a problem does not match any of the 244 trained templates (`classify_problem(problem) is None`) or `demo_cache.db`.
+  - Combines local LLM Lean-theorem synthesis (`_get_llm()`) with a deterministic generalized symbolic autoformalizer covering unseen polynomial/algebraic identities, numeric inequalities, divisibility/modulo/GCD, finite sums & binomial coefficients, multivariable partial derivatives, and 2×2 determinants / vector dot products.
+  - Strictly enforces zero-trust Lean 4 verification (`verify_async`) + faithfulness checks: valid out-of-domain claims return `VERIFIED` (`generalized_mode=True`) with intuitive explanations, while false or unprovable claims return `REJECTED` entirely (`verified_answer=None`).
+- **Lean 4 & SymPy Verification Parity (`backend/pipeline/lean_runner.py`, `backend/templates/registry.py`)**:
+  - Added out-of-domain classifier guard in `classify_problem` so external proof/inequality/partial-derivative/GCD claims are never hijacked by `quadratic_equation`.
+  - Added SymPy fallback support for multivariate `deriv`, `∣`, `%`, `Nat.gcd`, `Nat.choose`, `Finset.Icc`, `¬ (...)`, and inequalities.
+- **Verification**:
+  - `VERIMATH_STRICT_LEAN=true` live Lean 4.36.0 integration suite (`test_generalized_prover.py`): **4/4** test suites passing (`7/7` true out-of-domain proofs verified, `3/3` false claims strictly rejected, in-domain isolation & non-math `UNSUPPORTED` confirmed).
+  - Full regression suite: **266 / 266 passing (100.0%)**.

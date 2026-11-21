@@ -214,11 +214,69 @@ _CONCEPT_GUIDES: Dict[str, Dict[str, str]] = {
         ),
         "pitfall": "Watch negative coordinates when computing Δx = x₂ − x₁ and apply order of operations (exponents, multiplication/division, then addition/subtraction).",
     },
+    "generalized_identity": {
+        "title": "Algebraic Equivalence & Structural Identities",
+        "mental_model": "Two expressions are identically equal when expanding and collecting like terms produces the exact same polynomial.",
+        "intuition": (
+            "An identity holds for every real value of its variables because it only rearranges terms using distributivity, commutativity, and associativity—not by solving for one special number."
+        ),
+        "pitfall": "Watch cross-terms in powers like (a + b)² = a² + 2ab + b²: distributing powers across addition without cross-terms is the most common false-identity trap.",
+    },
+    "generalized_inequality": {
+        "title": "Order & Inequality Comparison",
+        "mental_model": "Compare magnitudes on the real number line (a < b means b − a > 0); multiplying by a negative flips the inequality.",
+        "intuition": (
+            "Checking an inequality asks whether one quantity sits strictly to the left or right of another on the number line, or shares the same boundary."
+        ),
+        "pitfall": "Double-check strict (<, >) versus inclusive (≤, ≥) bounds, and verify signs before cross-multiplying fractions.",
+    },
+    "generalized_number_theory": {
+        "title": "Divisibility, Modular Arithmetic & Greatest Common Divisors",
+        "mental_model": "Division algorithm: a = q·m + r with 0 ≤ r < m; a divides b iff remainder r = 0.",
+        "intuition": (
+            "Modular arithmetic wraps integers around a clock of size m, keeping only the remainder, while gcd(a, b) is the largest shared factor found by repeated Euclidean division."
+        ),
+        "pitfall": "Remember that divisibility 'a divides b' (a ∣ b) means b is a multiple of a—never reverse the order of a and b.",
+    },
+    "generalized_series_combinatorics": {
+        "title": "Finite Sums & Combinatorial Counting",
+        "mental_model": "Pair symmetric terms in arithmetic sums (Gauss pairing) and count unordered subsets via C(n, k) = n! / (k!(n − k)!).",
+        "intuition": (
+            "Summing 1 + 2 + ... + n pairs first and last terms into equal buckets of (n + 1), while C(n, k) counts how many distinct committees of size k can be chosen from n items."
+        ),
+        "pitfall": "Check inclusive endpoints carefully (whether summation starts at 0 or 1) and keep track of factorial cancellations.",
+    },
+    "generalized_partial_derivative": {
+        "title": "Multivariable Partial Differentiation — Holding Other Axes Still",
+        "mental_model": "To compute ∂f/∂x, freeze every other variable (y, z, ...) as a constant and differentiate wrt x alone.",
+        "intuition": (
+            "A partial derivative slices a multidimensional surface along one coordinate direction and measures the slope of that slice while keeping all other coordinates locked."
+        ),
+        "pitfall": "Terms containing only the frozen variables (such as y³ when differentiating wrt x) act like constants and differentiate to 0.",
+    },
+    "generalized_linear_algebra": {
+        "title": "Linear Algebra — Determinants & Vector Dot Products",
+        "mental_model": "For 2×2 [[a, b], [c, d]], det = a·d − b·c; dot product u·v = Σ uᵢ·vᵢ.",
+        "intuition": (
+            "A 2×2 determinant measures the signed area scaling factor of the linear transformation, while the dot product projects one vector onto another by summing component-wise products."
+        ),
+        "pitfall": "Always subtract the anti-diagonal (b·c) from the main diagonal (a·d) in determinants, and keep negative entries inside parentheses.",
+    },
+    "generalized_llm_synthesis": {
+        "title": "Generalized Mathematical Reasoning & Theorem Checking",
+        "mental_model": "Translate the statement into an exact symbolic claim and test every algebraic/numeric step against mathematical axioms.",
+        "intuition": (
+            "Even for unfamiliar problems outside standard templates, the underlying claim must hold logically without contradiction from definitions and arithmetic laws."
+        ),
+        "pitfall": "Verify every quantifier, domain condition, and boundary case so a single counterexample cannot invalidate the claim.",
+    },
 }
 
 
 def _select_guide_key(problem: str, template_id: Optional[str]) -> str:
     tid = (template_id or "").lower()
+    if tid in _CONCEPT_GUIDES:
+        return tid
     p_l = problem.lower()
 
     if "king" in tid or "kings_rule" in tid:
