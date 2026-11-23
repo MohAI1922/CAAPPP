@@ -22,6 +22,7 @@ import asyncio
 import logging
 import os
 import re
+import shutil
 import tempfile
 import time
 from dataclasses import dataclass
@@ -84,9 +85,66 @@ set_option linter.unusedTactic false
 # Configuration
 # ─────────────────────────────────────────────────────────────────────────────
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 LEAN_BINARY = os.getenv("LEAN_BINARY_PATH", "lean")
 LEAN_PROJECT_PATH = os.getenv("LEAN_PROJECT_PATH", "./lean/VeriMath")
 LEAN_TIMEOUT = int(os.getenv("LEAN_TIMEOUT_SECONDS", "20"))
+
+
+def resolve_lean_and_lake_binaries() -> tuple[str, str, str]:
+    """
+    Resolve (lean_bin, lake_bin, project_path) robustly.
+    Handles systemd services where ~/.elan/bin may be missing from PATH when
+    LEAN_BINARY_PATH or VERIMATH_STRICT_LEAN is set, while preserving SymPy
+    dev-mode fallback when `lean` is absent from PATH and strict mode is off.
+    """
+    elan_bin_dir = Path.home() / ".elan" / "bin"
+    strict_mode = os.getenv("VERIMATH_STRICT_LEAN", "false").lower() in ("1", "true", "yes")
+
+    lean_cfg = os.getenv("LEAN_BINARY_PATH", "").strip() or (LEAN_BINARY if LEAN_BINARY != "lean" else "")
+    if lean_cfg and (os.path.isfile(lean_cfg) or shutil.which(lean_cfg)):
+        lean_bin = lean_cfg
+    elif shutil.which("lean"):
+        lean_bin = shutil.which("lean") or "lean"
+    elif strict_mode and (elan_bin_dir / "lean").is_file():
+        lean_bin = str(elan_bin_dir / "lean")
+    else:
+        lean_bin = "lean"
+
+    lake_cfg = os.getenv("LAKE_BINARY_PATH", "").strip()
+    lean_parent_lake = Path(lean_bin).parent / "lake" if os.path.isabs(lean_bin) else None
+    if lake_cfg and (os.path.isfile(lake_cfg) or shutil.which(lake_cfg)):
+        lake_bin = lake_cfg
+    elif lean_parent_lake is not None and lean_parent_lake.is_file():
+        lake_bin = str(lean_parent_lake)
+    elif shutil.which("lake"):
+        lake_bin = shutil.which("lake") or "lake"
+    elif strict_mode and (elan_bin_dir / "lake").is_file():
+        lake_bin = str(elan_bin_dir / "lake")
+    else:
+        lake_bin = "lake"
+
+    raw_proj = os.getenv("LEAN_PROJECT_PATH", LEAN_PROJECT_PATH).strip() or "./lean/VeriMath"
+    proj_candidate = Path(raw_proj)
+    if not proj_candidate.is_absolute() and not proj_candidate.exists():
+        alt_proj = _REPO_ROOT / raw_proj
+        if alt_proj.exists():
+            proj_candidate = alt_proj
+    project_path = str(proj_candidate)
+
+    return lean_bin, lake_bin, project_path
+
+
+def is_lean_available() -> bool:
+    """Return True if either `lean` or `lake` resolves to an executable binary."""
+    lean_bin, lake_bin, _ = resolve_lean_and_lake_binaries()
+    return (
+        os.path.isfile(lean_bin)
+        or shutil.which(lean_bin) is not None
+        or os.path.isfile(lake_bin)
+        or shutil.which(lake_bin) is not None
+    )
+
 
 # Temp directory for verification files
 VERIFY_TMPDIR = Path(tempfile.gettempdir()) / "verimath_verify"
@@ -129,12 +187,24 @@ async def verify_async(lean_statement: str, timeout_seconds: int = LEAN_TIMEOUT)
 
     def _run_lean_subprocess():
         import subprocess
+        lean_bin, lake_bin, project_path = resolve_lean_and_lake_binaries()
+        env = os.environ.copy()
+        bin_dirs = []
+        for b in (lean_bin, lake_bin):
+            if os.path.isabs(b):
+                bdir = str(Path(b).parent)
+                if bdir not in bin_dirs:
+                    bin_dirs.append(bdir)
+        if bin_dirs:
+            env["PATH"] = os.pathsep.join(bin_dirs) + os.pathsep + env.get("PATH", "")
+
         try:
             res = subprocess.run(
-                ["lake", "env", LEAN_BINARY, str(lean_file)],
+                [lake_bin, "env", lean_bin, str(lean_file)],
                 capture_output=True,
                 text=True,
-                cwd=LEAN_PROJECT_PATH,
+                cwd=project_path,
+                env=env,
                 timeout=timeout_seconds,
             )
             return res.returncode, res.stdout + res.stderr
@@ -142,7 +212,7 @@ async def verify_async(lean_statement: str, timeout_seconds: int = LEAN_TIMEOUT)
             return "TIMEOUT", f"Lean verification timed out after {timeout_seconds} seconds."
         except FileNotFoundError:
             return "NOT_FOUND", (
-                f"Lean binary or lake not found at '{LEAN_BINARY}'. "
+                f"Lean binary or lake not found at '{lean_bin}' / '{lake_bin}'. "
                 "Is Lean 4 installed? Run: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh"
             )
         except Exception as e:
@@ -1161,7 +1231,8 @@ async def warmup() -> bool:
     """
     logger.info("Warming up verification engine...")
     warmup_statement = "example : 1 + 1 = 2 := by norm_num"
-    result = await verify_async(warmup_statement, timeout_seconds=60)
+    warmup_timeout = int(os.getenv("LEAN_WARMUP_TIMEOUT_SECONDS", "90"))
+    result = await verify_async(warmup_statement, timeout_seconds=warmup_timeout)
 
     if result.verdict == LeanVerdict.VERIFIED:
         if "SymPy" in result.lean_output:

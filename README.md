@@ -52,8 +52,33 @@ uvicorn backend.main:app --reload --port 8000
 # 7. Start frontend (in a new terminal)
 cd frontend && npm install && npm start
 
-# 8. Open http://localhost:3000
+# 8. Open http://localhost:3000 (or http://127.0.0.1:8000/app/)
 ```
+
+## Running on Raspberry Pi 4 / Pi 5 (64-bit Raspberry Pi OS)
+
+1. Flash **Raspberry Pi OS (64-bit / `aarch64`)** and clone the repository:
+   ```bash
+   git clone https://github.com/MohAI1922/CAAPPP.git verimath
+   cd verimath
+   ```
+2. Run the automated Raspberry Pi installer (configures Mosquitto, Lean 4 + Mathlib cache, Python `.venv`, Qwen2.5 GGUF model, camera/OCR tools, React build, `.env`, and `systemd` services):
+   ```bash
+   bash deployment/install_pi.sh        # Default: Qwen2.5-1.5B Q4_K_M (4 GB / 8 GB Pi)
+   # or for 8 GB Pi 4 / Pi 5:
+   bash deployment/install_pi.sh --3b
+   ```
+3. Verify hardware, Lean 4, OCR, cameras, and services:
+   ```bash
+   bash deployment/check_pi.sh
+   ```
+4. Open the app in Chromium on the Pi (or from another device on the same network):
+   - Single-process UI + API: `http://localhost:8000/app/`
+   - Or manual foreground launch (without `systemd`):
+     ```bash
+     bash deployment/run_pi.sh
+     ```
+
 
 ## Project Structure
 

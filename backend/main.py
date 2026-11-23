@@ -1961,22 +1961,27 @@ async def connectors_status_endpoint():
 @app.get("/health")
 async def health():
     """System health check — used by install script and monitoring."""
-    import shutil
+    import platform
     from backend.connectors.vision_ocr import get_connectors_status
+    from backend.pipeline.lean_runner import is_lean_available
 
-    lean_installed = shutil.which("lean") is not None or shutil.which("lake") is not None
+    lean_installed = is_lean_available()
     models_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "models"))
-    model_path = os.getenv("LLM_MODEL_PATH")
+    env_model = (os.getenv("LLM_MODEL_PATH") or "").strip()
+    model_path = env_model if (env_model and os.path.exists(env_model)) else None
     if not model_path:
         candidates = [
             os.path.join(models_dir, "qwen2_5_1_5b_verimath_pi4-q4_k_m.gguf"),
-            os.path.join(models_dir, "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf"),
             os.path.join(models_dir, "qwen2.5-3b-instruct-q4_k_m.gguf"),
             os.path.join(models_dir, "qwen2.5-1.5b-instruct-q4_k_m.gguf"),
+            os.path.join(models_dir, "Qwen2.5-1.5B-Instruct.Q4_K_M.gguf"),
             os.path.join(models_dir, "phi-3-mini-4k-instruct-q4.gguf"),
         ]
-        model_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
-    model_exists = os.path.exists(model_path)
+        model_path = next((p for p in candidates if os.path.exists(p)), None)
+        if not model_path and os.path.isdir(models_dir):
+            ggufs = sorted(os.path.join(models_dir, f) for f in os.listdir(models_dir) if f.endswith(".gguf"))
+            model_path = ggufs[0] if ggufs else None
+    model_exists = bool(model_path and os.path.exists(model_path))
 
     cache_count = len(demo_cache.list_all())
     conn_status = get_connectors_status()
@@ -1986,7 +1991,9 @@ async def health():
         "lean_installed": lean_installed,
         "strict_lean_mode": os.getenv("VERIMATH_STRICT_LEAN", "false").lower() in ("1", "true", "yes"),
         "model_loaded": model_exists,
-        "target_hardware": "Raspberry Pi 4 (8 GB RAM)",
+        "model_file": os.path.basename(model_path) if model_exists and model_path else None,
+        "arch": platform.machine(),
+        "target_hardware": "Raspberry Pi 4 / 5 (ARM64)",
         "demo_cache_size": cache_count,
         "supported_templates": list(TEMPLATES.keys()),
         "connectors": conn_status,

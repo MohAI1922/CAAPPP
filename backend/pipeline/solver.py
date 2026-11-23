@@ -53,8 +53,9 @@ def _get_llm():
     models_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "models"))
     default_model = os.path.join(models_dir, "phi-3-mini-4k-instruct-q4.gguf")
     
-    # Auto-detect any .gguf file in models/ if LLM_MODEL_PATH is not explicitly set
-    model_path = os.getenv("LLM_MODEL_PATH")
+    # Auto-detect any .gguf file in models/ if LLM_MODEL_PATH is unset or missing
+    env_model_path = (os.getenv("LLM_MODEL_PATH") or "").strip()
+    model_path = env_model_path if (env_model_path and os.path.exists(env_model_path)) else None
     if not model_path:
         qwen_candidates = [
             os.path.join(models_dir, "qwen2_5_1_5b_verimath_pi4-q4_k_m.gguf"),
@@ -69,10 +70,10 @@ def _get_llm():
         elif os.path.exists(default_model):
             model_path = default_model
         elif os.path.exists(models_dir):
-            ggufs = [os.path.join(models_dir, f) for f in os.listdir(models_dir) if f.endswith(".gguf")]
-            model_path = ggufs[0] if ggufs else default_model
+            ggufs = sorted(os.path.join(models_dir, f) for f in os.listdir(models_dir) if f.endswith(".gguf"))
+            model_path = ggufs[0] if ggufs else (env_model_path or default_model)
         else:
-            model_path = default_model
+            model_path = env_model_path or default_model
 
     # On Raspberry Pi 4 (8 GB RAM), 4096 tokens context fits comfortably with Lean 4 + Mathlib
     n_ctx = int(os.getenv("LLM_N_CTX", "4096"))
