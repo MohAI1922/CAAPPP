@@ -52,7 +52,13 @@ fi
 # Step 1: System packages
 echo ""
 echo "[1/8] Updating package lists and installing dependencies..."
-sudo apt-get update
+if ! sudo apt-get update; then
+    echo "⚠️  WARNING: 'apt-get update' hit an unreachable/blocked mirror (e.g. archive.raspberrypi.com 403 over HTTP)."
+    if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+        echo "Refreshing core Debian repositories (/etc/apt/sources.list.d/debian.sources)..."
+        sudo apt-get update -o Dir::Etc::sourcelist="/etc/apt/sources.list.d/debian.sources" -o Dir::Etc::sourceparts="-" || true
+    fi
+fi
 sudo apt-get install -y \
     curl git python3-pip python3-venv python3-dev \
     mosquitto mosquitto-clients nodejs npm \
