@@ -24,36 +24,40 @@ Student types problem → LLM solves it → LLM formalizes into Lean 4 template
 
 ## Quick Start (Development on Laptop)
 
+### Fast Start (No C++ Compiler or Mathlib Build Required)
+Uses SymPy CAS + RapidOCR + React so you can test the entire UI, solver, step grader, and laptop webcam OCR in ~2 minutes on Windows, macOS, or Linux:
+
 ```bash
 # 1. Clone and set up Python environment
-git clone <repo>
+git clone https://github.com/MohAI1922/CAAPPP.git verimath
 cd verimath
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
+pip install -r requirements-laptop.txt
 
-# 2. Copy .env.example to .env and fill in your keys
-cp .env.example .env
+# 2. Create .env (keep VERIMATH_STRICT_LEAN=false for fast SymPy fallback)
+cp .env.example .env             # Windows: copy .env.example .env
 
-# 3. Install Lean 4 (via elan)
-curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
-
-# 4. Build Mathlib (DO THIS ON LAPTOP, NOT PI — takes 30-90 min first time)
-cd lean/VeriMath
-lake update && lake build
-cd ../..
-
-# 5. Download Phi-3 Mini model
-python scripts/download_model.py
-
-# 6. Start backend
+# 3. Start backend
 uvicorn backend.main:app --reload --port 8000
 
-# 7. Start frontend (in a new terminal)
+# 4. Start frontend (in a new terminal)
 cd frontend && npm install && npm start
-
-# 8. Open http://localhost:3000 (or http://127.0.0.1:8000/app/)
 ```
+
+Open your browser to `http://localhost:3000`.
+
+### Optional: Full Lean 4 Kernel + Local Qwen2.5 GGUF on Laptop
+1. Install Lean 4 (`elan`), then fetch prebuilt Mathlib `.olean` artifacts:
+   ```bash
+   curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+   cd lean/VeriMath && lake exe cache get && lake build VeriMath && cd ../..
+   ```
+2. Set `VERIMATH_STRICT_LEAN=true` in `.env`.
+3. Optionally install `llama-cpp-python` (`pip install -r requirements.txt`, requires CMake + C++ compiler) and download the local Qwen2.5 model:
+   ```bash
+   python scripts/download_model.py        # Qwen2.5-1.5B Q4_K_M (~980 MB)
+   ```
 
 ## Running on Raspberry Pi 4 / Pi 5 (64-bit Raspberry Pi OS)
 

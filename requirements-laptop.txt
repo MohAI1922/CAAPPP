@@ -1,0 +1,21 @@
+# Fast laptop development & testing dependencies (Windows / macOS / Linux)
+# Uses SymPy CAS + RapidOCR + FastAPI without requiring C++ compiler / llama-cpp-python build.
+# For full local GGUF inference on Raspberry Pi (or laptops with C++ build tools), use requirements.txt.
+
+fastapi==0.111.0
+uvicorn[standard]==0.30.0
+pydantic==2.7.0
+paho-mqtt==2.1.0
+firebase-admin==6.5.0
+google-generativeai==0.7.2
+python-dotenv==1.0.1
+httpx==0.27.0
+pytest==8.2.0
+pytest-asyncio==0.23.7
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.25.0
+sympy>=1.12
+Pillow>=10.0.0
+python-multipart>=0.0.9
+pytesseract>=0.3.10
+rapidocr-onnxruntime>=1.3.20
